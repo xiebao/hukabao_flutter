@@ -199,17 +199,15 @@ String _token;
     final model = globleModel().of(context);
     print("----------------------${model.token}-------------------------------------");
     print(model.token) ;
-    if(model.token=='') {
+    _token=model.token;
+    if(_token=='') {
       DialogUtils.close2Logout(context);
     }
     else
       {
-        setState(() {
-          _token=model.token;
         _userName=model.userinfo.name;
         _userAvatar=model.userinfo.avtar;
         _userPhone=model.userinfo.phone;
-        });
       }
 
   }

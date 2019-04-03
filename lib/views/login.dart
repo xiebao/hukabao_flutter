@@ -305,8 +305,15 @@ class LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         child: new Column(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: Container(
+                height: 10,
+                child: Text(''),
+              ),
+            ),
             new Padding(
                 padding: new EdgeInsets.all(30.0),
                 child: Image.asset(

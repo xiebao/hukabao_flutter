@@ -17,16 +17,14 @@ class WebView extends StatefulWidget {
 class _ArticleDetailState extends State<WebView> {
   bool hasLoaded = false;
   final flutterWebViewPlugin = new FlutterWebviewPlugin();
-  String _token = '';
-
+  String _token;
+  void _gettoken()async{
+    await HttpUtils().theToken.then((v){ setState(() {_token= v; });});
+  }
   @override
   void initState() {
     super.initState();
-
-    setState(() async{
-      _token =await HttpUtils().theToken;
-    });
-
+    _gettoken();
     flutterWebViewPlugin.onStateChanged.listen((state) {
       if (state.type == WebViewState.finishLoad) {
         //有掘金web版本详情页的finished触发时间实在太长，所以这里就省略了hasLoaded的处理,其实也就是为了界面更友好

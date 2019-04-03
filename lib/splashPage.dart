@@ -16,52 +16,50 @@ class SplashState extends State<SplashPage> {
   Timer timer;
   bool _isupdate = false;
 
-  void _checkUpdateApp() async{
-      if (await UpdateApp().checkDownloadApp) {
-        await DialogUtils()
-            .showMyDialog(context, '有更新版本，是否马上更新?')
-            .then((rv) { _isupdate=  rv ? true : false;
-        }).whenComplete((){
-          if (!_isupdate) {
-            timer = Timer(const Duration(milliseconds: 1500), () async {
-              try {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                var token = prefs.getString('token') ?? '';
-                print('========get init token==$token');
-                if (token == '')
-                  Application.run(context, "/login");
-                else {
-                  final model = globleModel().of(context);
-                  print(
-                      "------------welpage----------${model.token}--------------------------");
-                  HttpUtils.apipost(context, 'User/userInfo', {}, (response) async {
-                    print('=================userInfo======================');
-                    print(response);
-                    if (response["error_code"] == '1' && response["userinfo"]) {
-                      await model
-                          .setlogin(token, response["userinfo"] ?? {})
-                          .then((_) {
-                        Application.run(context, "/home");
-                      });
-                    } else
-                      Application.run(context, "/login");
+  void _checkUpdateApp() async {
+    if (await UpdateApp().checkDownloadApp) {
+      await DialogUtils().showMyDialog(context, '有更新版本，是否马上更新?').then((rv) {
+        _isupdate = rv ? true : false;
+      }).whenComplete(() {
+        if (!_isupdate) {
+          timer = Timer(const Duration(milliseconds: 1500), () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            var token = prefs.getString('token') ?? '';
+            print('========get init token==$token');
+            if (token == '')
+              Application.run(context, "/login");
+            else {
+              final model = globleModel().of(context);
+              print(
+                  "--------welpage----------${model.token}--------------------------");
+              await HttpUtils.apipost(context, 'User/userInfo', {},
+                  (response) async {
+                print('=================userInfo======================');
+                print(response);
+                if (response["error_code"].toString() == '1') {
+                  await model
+                      .setlogin(token, response["userinfo"])
+                      .whenComplete(() {
+                    Application.run(context, "/home");
                   });
-                }
-              } catch (e) {}
-            });
-          }else
-          {
-            UpdateApp().webdownload(context);
-          }
-        });
-      }
-
+                } else
+                  Application.run(context, "/login");
+              }).whenComplete(() {
+                print('whenComplete');
+              });
+            }
+          });
+        } else {
+          UpdateApp().webdownload(context);
+        }
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
-     _checkUpdateApp();
+    _checkUpdateApp();
   }
 
   @override

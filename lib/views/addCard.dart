@@ -166,9 +166,14 @@ class addCardState extends State<addCard> {
   _checkvalue()
   {
      _name= _nameCtrl.text.trim();
-      if(_name.isEmpty ||  !ComFunUtil.isChinaPhoneLegal(_name))
+      if(_name.isEmpty )
         return  DialogUtils.showToastDialog(context, text: '姓名输入错误');
-    _idCard= _idCardCtrl.text.trim();
+
+     _phoneNo= _phoneNoCtrl.text.trim();
+     if(_phoneNo.isEmpty ||  !ComFunUtil.isChinaPhoneLegal(_name) )
+       return  DialogUtils.showToastDialog(context, text: '预留手机号必须填写');
+
+     _idCard= _idCardCtrl.text.trim();
     if(_idCard.isEmpty ||_idCard.length<16 || _idCard.trim().length > 18)
       return  DialogUtils.showToastDialog(context, text: '身份证号码输入错误');
 
@@ -203,10 +208,6 @@ class addCardState extends State<addCard> {
      _cardCvn2= _cardCvn2Ctrl.text;
      if(_cardCvn2.isEmpty && _cardType=='2' )
        return  DialogUtils.showToastDialog(context, text: '卡片背面3位校验码必须填写');
-
-     _phoneNo= _phoneNoCtrl.text.trim();
-     if(_phoneNo.isEmpty && _cardType=='1'  )
-       return  DialogUtils.showToastDialog(context, text: '预留手机号必须填写');
 
 
 

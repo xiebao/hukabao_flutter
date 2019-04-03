@@ -8,7 +8,23 @@ class Application {
   static void run(context, url) async{
     if (url.startsWith('/web?')) {
 //web页面是否过期
-      final model = globleModel().of(context);
+      await HttpUtils().theToken.then((token) async{
+        if(token=='')
+          DialogUtils.close2Logout(context);
+        else{
+          await HttpUtils.request(
+              'Index/checktoken/token/$token', data: {}, method: 'post')
+              .then((response) {
+            if (response["error_code"].toString() == '1') {
+              Application.router.navigateTo(
+                  context, url, transition: TransitionType.fadeIn);
+            } else
+              DialogUtils.close2Logout(context);
+          });
+        }
+      });
+
+      /*final model = globleModel().of(context);
       print("------Application---Router------${model.token}------------");
       if(model.token=='')
         DialogUtils.close2Logout(context);
@@ -22,7 +38,7 @@ class Application {
           } else
             DialogUtils.close2Logout(context);
         });
-      }
+      }*/
     }
     else
       Application.router.navigateTo(context, url,transition: TransitionType.native);

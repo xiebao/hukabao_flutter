@@ -25,6 +25,7 @@ class globleModel extends Model {
     _token = token;
     _loginStatus = true;
     _userinfo = Userinfo.fromJson(userinfo);
+    print(_userinfo.phone);
     // 通知所有的 listener
     notifyListeners();
   }
