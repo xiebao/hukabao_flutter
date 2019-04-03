@@ -1,0 +1,52 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
+import '../routers/application.dart';
+import '../model/index_model.dart';
+
+class SwipPage extends StatelessWidget {
+  List<PicsCell> picList;
+  SwipPage(List<PicsCell> picst) {
+    this.picList = picst;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        width: MediaQuery.of(context).size.width,
+        height: 210,
+        child: picList == null || picList == []
+            ? Text('没有显示的')
+            : Swiper(
+                itemBuilder: (BuildContext context, int index) {
+                  return new Image.network(
+                    picList[index].imgurl,
+                    fit: BoxFit.fitWidth,
+                    width: MediaQuery.of(context).size.width,
+                  );
+                },
+                loop: false,
+                itemCount: picList.length,
+                scale: 0.8,
+                pagination: SwiperPagination(
+                    alignment: Alignment.bottomCenter,
+                    margin: const EdgeInsets.fromLTRB(0, 0, 10, 10),
+                    builder: DotSwiperPaginationBuilder(
+                        color: Colors.black54, activeColor: Colors.white)),
+                index: 0,
+                autoplay: false,
+                autoplayDisableOnInteraction: false,
+                onTap: (index) {
+                  String url = '';
+                  if (picList[index].url.isNotEmpty) {
+                    url =
+                        '/web?url=${Uri.encodeComponent(picList[index].url)}&title=${Uri.encodeComponent(picList[index].title ?? '护卡宝')}';
+                    Application.run(context, url);
+                  }
+                },
+              ),
+      ),
+    );
+  }
+}

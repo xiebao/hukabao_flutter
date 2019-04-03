@@ -1,0 +1,89 @@
+import 'package:flutter/material.dart';
+import '../model/model_cell.dart';
+import '../routers/application.dart';
+import 'dart:core';
+
+class IndexModelList extends StatelessWidget {
+  IndexModelList(this.listData);
+  final List<ModelCell> listData ;
+//  ,this.token String token;
+
+
+//  IndexModelList({Key key, this.listData}) : super(key: key);
+
+  List<Widget> buildItemList(
+    BuildContext context,
+  ) {
+    int number = listData.length;
+    List<Widget> widgetList = new List();
+    for (int i = 0; i < number; i++) {
+      ModelCell item = listData[i];
+      widgetList.add(setItemWidget(context, item));
+    }
+    return widgetList;
+  }
+
+  Widget setItemWidget(BuildContext context, ModelCell cellItem) {
+    String txt = cellItem.modName;
+    String url = '';
+    if (cellItem.modtype == '0') {
+      url = cellItem.fluUrl;
+    } else {
+//        var bodyJson = '{"url":'+cellItem.url+',"title":'+cellItem.modName+'}';
+      //        url = "/web/$bodyJson";
+      url =
+          '/web?url=${Uri.encodeComponent(cellItem.url)}&title=${Uri.encodeComponent(cellItem.modName)}';
+    }
+
+    Container itemContainer = new Container(
+      child: GestureDetector(
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          verticalDirection: VerticalDirection.down,
+          children: <Widget>[
+            Expanded(
+              child: new Container(
+                constraints: new BoxConstraints.expand(),
+                decoration: new BoxDecoration(
+                  image: new DecorationImage(
+                    image: cellItem.modtype == '0'
+                        ? AssetImage('images/sysicon/' + cellItem.iconname)
+                        : NetworkImage(cellItem.icon),
+//                image: new NetworkImage('http://h.hiphotos.baidu.com/zhi6e06f06c.jpg'),
+//                  image: AssetImage('images/sysicon/icon_jilu.png'),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(child: Text(txt))
+          ],
+        ),
+        /*      onTap: () {
+           Application.run(context, url);;
+        },*/
+      ),
+    );
+
+    return InkWell(
+        onTap: () {
+          Application.run(context, url);
+//          Application.cheToken(context,(){Application.router.navigateTo(context, url);});
+        },
+        child: itemContainer);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Center(
+      child: new GridView.count(
+        crossAxisCount: 3,
+        padding: const EdgeInsets.all(10.0),
+        mainAxisSpacing: 0.0,
+        crossAxisSpacing: 0.0,
+        children: buildItemList(context),
+      ),
+    );
+  }
+}

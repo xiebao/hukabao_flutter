@@ -1,0 +1,61 @@
+
+class Page {
+  Page({this.label});
+  final String label;
+  String get id => label[0];
+  @override
+  String toString() => '$runtimeType("$label")';
+}
+
+class BookCell {
+  String id;
+  String name;
+  String cardName; //"中国建设银行"
+  String idCardNo; //640221197608265714
+  String cardNo; //***************2584
+  String cardType; //
+  String certType;
+  String phoneNo; //
+  String bankCode; //1051000
+  String bankAbbr; //
+  String cardIcon; //http://app.hukabao.com/
+  String bankBill; //
+  String bankRepayDate; //
+  String dfault; //
+
+  BookCell(
+      {this.id,
+      this.name,
+      this.cardName,
+      this.idCardNo,
+      this.cardNo,
+      this.cardType,
+      this.certType,
+      this.phoneNo,
+      this.bankCode,
+      this.bankAbbr,
+      this.cardIcon,
+      this.bankBill,
+      this.bankRepayDate,
+      this.dfault});
+
+  factory BookCell.fromJson(Map<String, dynamic> json) {
+    return BookCell(
+        id: json['id']??'',
+        name: json['name']??'',
+        cardName: json['cardName']??'',
+        idCardNo: json['idCardNo']??'',
+        cardNo: json['cardNo']??'',
+        cardType: json['cardType']??'1',
+        certType: json['certType']??'1',
+        phoneNo: json['phoneNo']??'',
+        bankCode: json['bankCode']??'',
+        bankAbbr: json['bankAbbr']??'',
+        cardIcon: json['bankAbbr'].toString().toLowerCase() ?? 'unionpay',
+//        bankBill: json['userData']['bankBill'],
+        bankBill: json['bankBill']??'',
+        bankRepayDate: json['bankRepayDate']??'',
+        dfault: json['default']??'0');
+  }
+
+}
