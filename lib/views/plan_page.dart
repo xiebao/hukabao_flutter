@@ -28,8 +28,11 @@ class planPageState extends State<planPage> {
   List<BookCell> _cardsList = [];
   int _indexcard = 0;
   String _curCardId;
-
+  String _orderNo,_smsSeq ;
   List<PlanViewCell> _planViewList = List();
+
+  TextEditingController _regCodeCtrl = TextEditingController();
+  bool _regclk=false;
 
   void _dataInit() async {
     if (_isRequesting) return;
@@ -75,12 +78,52 @@ class planPageState extends State<planPage> {
   }
 
   void _submitPlan() async {
+    bool isplanreg=true;
     if (_isRequesting)
       _curCardId = _cardsList[_indexcard].id;
     else
       return;
 
-    try {
+    if (_curCardId.isEmpty)
+      DialogUtils.showToastDialog(context, text: "请选择卡片");
+
+    if( _cardsList[_indexcard].planBanged!='1')
+      {
+        isplanreg=false;
+        await DialogUtils().showMyDialog(context, '卡片未激活注册计划，是否现在激活?')
+            .then((rv) async{
+          if (rv) {
+            Map<String, String> params = {
+              "cardId": _curCardId,
+            };
+            print("----_getsmsCode---");
+           await HttpUtils.apipost(context, "Index/extcardAddFirst", params, (response) {
+                print(response);
+                DialogUtils.showToastDialog(context, text: response['message']);
+                if (response['error_code'] == 1) {
+                  _orderNo = response['data']['orderNo'];
+                  _smsSeq = response['data']['smsSeq'];
+                }
+              }).then((_) {
+             showCardRegDialog().then((v){
+               if(v!=null && v!=''){
+                 List<String> msg= v.split(",");
+                 isplanreg= (msg[0]== '1' ? true:false);
+                 DialogUtils.showToastDialog(context, text: msg[1]);
+               }
+
+             });
+           });
+          }
+        }).whenComplete(() {
+          if(isplanreg) _submit();
+        });
+      }
+      else
+        _submit();
+  }
+ void _submit() async{
+    try{
       DateTime time1 = DateTime.parse(_startDayCtroller.text);
       DateTime time2 = DateTime.parse(_endDayCtroller.text);
       if (time1.isBefore(time2)) {
@@ -93,59 +136,58 @@ class planPageState extends State<planPage> {
         DialogUtils.showToastDialog(context, text: "开始日期必须早于结束日期");
         return;
       }
-    } catch (exception) {
-      DialogUtils.showToastDialog(context, text: "日期格式异常");
-      return;
     }
+    catch(e)
+   {
+     DialogUtils.showToastDialog(context, text: "日期格式错误");
+     return;
+   }
 
-    if (_curCardId.isNotEmpty) {
-      Map<String, String> params = {
-        "cardId": _curCardId,
-        "money": _amountCtroller.text,
-        "startTime": _startDayCtroller.text,
-        "endTime": _endDayCtroller.text,
-        "reserved": _bandCtroller.text,
-        "bondPer": "50"
-      };
-      print(params);
-      try {
-        showLoadingDialog();
+
+   Map<String, String> params = {
+     "cardId": _curCardId,
+     "money": _amountCtroller.text,
+     "startTime": _startDayCtroller.text,
+     "endTime": _endDayCtroller.text,
+     "reserved": _bandCtroller.text,
+     "bondPer": "50"
+   };
+   print(params);
+   try {
+     showLoadingDialog();
 
 //      return;
-        HttpUtils.apipost(context, 'Order/planAddOther', params, (response) {
-          print('=================Order/planAddOther======================');
+    await HttpUtils.apipost(context, 'Order/planAddOther', params, (response) {
+       print('=================Order/planAddOther======================');
 //          print(response['data']['info']);
-          if (response['error_code'] != "-1") {
-            response['data']['planList'].forEach((ele) {
+       if (response['error_code'] != "-1") {
+         response['data']['planList'].forEach((ele) {
 //              print("${ele['card_id']}|${ele['plan_money']}|${ele['plan_bond']}|${ele['plan_time']}|${ele['plan_test']}");
-              _planViewList.add(PlanViewCell.fromJson(ele));
-            });
+           _planViewList.add(PlanViewCell.fromJson(ele));
+         });
 
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => planReviewPage(
-                    _planViewList,
-                    new PlanCell(
-                      cardNo: response['data']['info']['card'].toString(),
-                      planinfo: response['data']['info']['title'].toString(),
-                      planID: response['data']['planId'].toString(),
-                    )),
-              ),
-            );
-          } else
-            DialogUtils.showToastDialog(context, text: response['message']);
-        });
-      } catch (e) {
-        print(e);
-        DialogUtils.showToastDialog(context, text: '网络连接错误');
-      } finally {
-        hideLoadingDialog();
-      }
-    } else
-      DialogUtils.showToastDialog(context, text: "请选择卡片");
-  }
-
+         Navigator.push(
+           context,
+           MaterialPageRoute(
+             builder: (context) => planReviewPage(
+                 _planViewList,
+                 new PlanCell(
+                   cardNo: response['data']['info']['card'].toString(),
+                   planinfo: response['data']['info']['title'].toString(),
+                   planID: response['data']['planId'].toString(),
+                 )),
+           ),
+         );
+       } else
+         DialogUtils.showToastDialog(context, text: response['message']);
+     });
+   } catch (e) {
+     print(e);
+     DialogUtils.showToastDialog(context, text: '网络连接错误');
+   } finally {
+     hideLoadingDialog();
+   }
+ }
   void _itemselected(int index) {
     print('第$index');
     print(_cardsList[index].cardName);
@@ -386,28 +428,63 @@ class planPageState extends State<planPage> {
         ));
   }
 
-  Widget _buildAmountText() {
-    return TextFormField(
-      controller: _amountCtroller,
-      decoration: InputDecoration(
-        labelText: '请输入金额',
-        filled: true,
-        contentPadding: EdgeInsets.only(left: 10.0, right: 10.0),
-      ),
-      //键盘展示为号码
-      keyboardType: TextInputType.number,
-      //只能输入数字
-      inputFormatters: <TextInputFormatter>[
-        WhitelistingTextInputFormatter.digitsOnly,
-      ],
-      validator: (String value) {
-        if (value.isEmpty) {
-          return '背面签名3位数';
-        }
-      },
+  Future<String> showCardRegDialog() {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => new AlertDialog(
+            title: new Text("计划卡片激活注册"),
+            contentPadding: EdgeInsets.all(10.0),
+            content: Container(
+              height: 30,
+              child: Column(
+                children: <Widget>[
+                  Text('激活码'),
+                  TextField(
+                    controller: _regCodeCtrl,
+                    cursorColor: GlobalConfig.mainColor,
+                    maxLength: 6,
+                    keyboardType: TextInputType.phone,
+                    decoration: new InputDecoration(
+                      hintText: '请输入激活码',
+                      contentPadding: EdgeInsets.all(10.0),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("取消"),
+                onPressed: () {
+                  Navigator.of(context).pop('');
+                },
+              ),
+              new FlatButton(
+                child: _regclk==true? Text('验证中…'): Text("确定"),
+                onPressed: () {
+                  if (_regCodeCtrl.text != '') {
+                    Map<String, String> params = {
+                      "cardId": _curCardId,
+                      "orderNo": _orderNo,
+                      "smsSeq": _smsSeq,
+                      "phoneCode": _regCodeCtrl.text.trim()
+                    };
+                    setState(() {
+                      _regclk=true;
+                    });
 
-    );
+                      HttpUtils.apipost(
+                          context, "Index/extcardAdd", params, (response) {
+                        print(response);
+                        Navigator.of(context).pop("${response['error_code']},${response['message']}");
+                      });
+
+                  }
+
+                }
+              )
+            ])) ?? '';
   }
-
 
 }

@@ -214,7 +214,7 @@ class UpdateApp {
     if (defaultTargetPlatform == TargetPlatform.android) {
       print('android down!');
       downresponse = await dio.download(
-          "https://down.hukabao.com/andriod/hkb.apk", "$path/hukabao.apk",
+          "https://down.hukabao.com/andriod/app-release-flutter.apk", "$path/hukabao.apk",
           onProgress: (received, total) {
         _downloading(context, received, total);
       }).whenComplete(() async{

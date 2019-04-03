@@ -84,8 +84,8 @@ class CardDataItem extends StatelessWidget {
     return  ListTile(
           leading: CircleAvatar(
             backgroundImage: AssetImage(
-              "images/bank/${data.cardIcon??'unionpay'}.png",
-            ),
+              "images/bank/${data.cardIcon ?? 'unionpay'}.png",
+            ) ?? AssetImage( "images/bank/unionpay.png"),
             maxRadius: 20,
             backgroundColor: Colors.white,
           ),
