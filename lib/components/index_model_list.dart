@@ -25,16 +25,6 @@ class IndexModelList extends StatelessWidget {
 
   Widget setItemWidget(BuildContext context, ModelCell cellItem) {
     String txt = cellItem.modName;
-    String url = '';
-    if (cellItem.modtype == '0') {
-      url = cellItem.fluUrl;
-    } else {
-//        var bodyJson = '{"url":'+cellItem.url+',"title":'+cellItem.modName+'}';
-      //        url = "/web/$bodyJson";
-      url =
-          '/web?url=${Uri.encodeComponent(cellItem.url)}&title=${Uri.encodeComponent(cellItem.modName)}';
-    }
-
     Container itemContainer = new Container(
       child: GestureDetector(
         child: new Column(
@@ -68,8 +58,11 @@ class IndexModelList extends StatelessWidget {
 
     return InkWell(
         onTap: () {
-          Application.run(context, url);
-//          Application.cheToken(context,(){Application.router.navigateTo(context, url);});
+          if (cellItem.modtype == '0') {
+            Application.run(context, cellItem.fluUrl);
+          } else {
+            Application.run(context, "/web",url: cellItem.url,title:txt);
+          }
         },
         child: itemContainer);
   }

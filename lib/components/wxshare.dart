@@ -51,15 +51,9 @@ class wxShareDialog extends StatelessWidget {
             fluwx.share(WeChatShareImageModel(
                     image: img, //"assets://images/down_qrcode.png",
                     thumbnail: "",
-                    transaction: '', //,
+                    transaction: url, //,
                     scene: WeChatScene.TIMELINE,
                     description: "护卡宝邀请您"));
-/*                .then((vr) {
-                  print('-----微信分享：----');
-                  print(img);
-              print(vr);
-//              Navigator.pop(context, 'Cancel');
-            });*/
           },
         ),
 

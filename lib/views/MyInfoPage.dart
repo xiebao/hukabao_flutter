@@ -4,9 +4,6 @@ import '../model/globle_model.dart';
 import '../utils/DialogUtils.dart';
 import '../routers/application.dart';
 import '../globleConfig.dart';
-
-import 'webViewnew.dart';
-import 'Detail.dart';
 import 'login.dart';
 
 class MyInfoPage extends StatefulWidget {
@@ -14,16 +11,16 @@ class MyInfoPage extends StatefulWidget {
   MyInfoPageState createState() => new MyInfoPageState();
 }
 
-class MyInfoPageState extends State<MyInfoPage> {
-/*  with  AutomaticKeepAliveClientMixin
+class MyInfoPageState extends State<MyInfoPage>  with  AutomaticKeepAliveClientMixin{
+
 @override
-bool get wantKeepAlive => true;*/
+bool get wantKeepAlive => true;
 
 String _token;
   static const double IMAGE_ICON_WIDTH = 30.0;
   static const double ARROW_ICON_WIDTH = 16.0;
 
-  var titles = ["","VIP支付", "我的邀请码", "我的推荐", "我的收益", "分享一下","关于我们", "退出"];
+  var titles = ["","VIP支付", "我的邀请码", "我的推荐", "我的收益", "关于我们","分享一下", "退出"];
   List icons = [
     Icons.all_inclusive,
     Icons.supervisor_account,
@@ -139,47 +136,21 @@ String _token;
   _handleListItemClick(int index) {
     switch (index) {
       case 1:
-        String h5_url = "${GlobalConfig.webbase}/WebPay/vipPay/token/";
-        Application.run(context, "/web?url=${Uri.encodeComponent(h5_url)}&title=${Uri.encodeComponent('VIP支付')}");
-        return;
-//        String h5_url = "${GlobalConfig.webbase}/WebPay/payCode/?uid=663&money=100&token=";
-        Navigator.push(
-            context,
-            new MaterialPageRoute(
-                builder: (context) => new WebView('VIP支付',h5_url )));
+        Application.run(context, "/web",url: "${GlobalConfig.webbase}/WebPay/vipPay/token/",title: 'VIP支付');
         break;
       case 2:
-//        是一张图来的
-                String h5_url = "${GlobalConfig.webbase}CreditCard/myqrCode/token/";
-        print(h5_url);
-        Application.run(context, "/web?url=${Uri.encodeComponent(h5_url)}&title=${Uri.encodeComponent('我的邀请码')}");
+//        是一张图来的   String img_url = "${GlobalConfig.webbase}CreditCard/myqrCode/token/";
+          Application.run(context, "/web",url: "${GlobalConfig.webbase}/CreditCard/myqrCode/token/",title: '我的邀请码');
 
         break;
       case 3:
-        String h5_url = "${GlobalConfig.webbase}CreditCard/shareProfit/token/$_token";
-        Navigator.push(
-            context,
-            new MaterialPageRoute(
-                builder: (context) => new WebView('我的推荐',h5_url)));
+        Application.run(context, "/web",url: "${GlobalConfig.webbase}/CreditCard/shareProfit/token/",title: '我的推荐');
         break;
-       /* Navigator.push(context,
-            new MaterialPageRoute(builder: (context) => new Detail('88')));
-        break;*/
       case 4:
-        String h5_url = "${GlobalConfig.webbase}/CreditCard/myMoneyBag/token/$_token";
-        Navigator.push(
-            context,
-            new MaterialPageRoute(
-                builder: (context) => new WebView('我的钱包',h5_url)));
+        Application.run(context, "/web",url:"${GlobalConfig.webbase}/CreditCard/myMoneyBag/token/",title: '我的钱包');
         break;
       case 5:
-        DialogUtils.close2Logout(context);
-     /*
-        String h5_url = "https://github.com/zhibuyu/Flutter_Stocks/issues";
-        Navigator.push(
-            context,
-            new MaterialPageRoute(
-                builder: (context) => new WebView( '意见反馈',h5_url)));*/
+        Application.run(context, "/web",url: "${GlobalConfig.base}/Public/helpText",title: '联系我们',withToken: false);
         break;
       case 6:
         Application.router.navigateTo(context, "/share");

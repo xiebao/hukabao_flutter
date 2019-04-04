@@ -24,9 +24,10 @@ class PicsCell {
   String id;
   String imgurl;
   String url;
+  String deft;
   String time;
 
-  PicsCell({this.title, this.id, this.imgurl, this.url, this.time});
+  PicsCell({this.title, this.id, this.imgurl, this.url, this.time,this.deft});
 
   factory PicsCell.fromJson(Map<String, dynamic> json) {
     return PicsCell(
@@ -34,6 +35,7 @@ class PicsCell {
       url: json['url'] ?? '',
       id: json['id'] ?? '',
       imgurl: json['image_url'] ?? '',
+      deft: json['default'] ?? '0',
       time: json['create_time'] ?? '', // Util.getTimeDuration(json['create_time'])
     );
   }

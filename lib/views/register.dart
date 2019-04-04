@@ -4,9 +4,10 @@ import 'package:flutter/services.dart';
 import '../utils/HttpUtils.dart';
 import '../utils/DialogUtils.dart';
 import '../utils/comUtil.dart';
+import '../routers/application.dart';
 
 import '../globleConfig.dart';
-import '../views/webView.dart';
+import '../views/webViewnew.dart';
 
 class register extends StatefulWidget {
   @override
@@ -158,10 +159,7 @@ class registerState extends State<register> {
             ),
             InkWell(
               onTap: () {
-                String linkUrl = GlobalConfig.base + "Public/regText";
-                 Navigator.push(
-                    context, MaterialPageRoute(  builder: (context) => webpage("使用协议", linkUrl),)
-                );
+                Application.run(context, "/web",url: '${GlobalConfig.base}/Public/regText',title: '注册协议',withToken: false);
               },
               child: new Text(
                 '注册协议',

@@ -38,11 +38,8 @@ class SwipPage extends StatelessWidget {
                 autoplay: false,
                 autoplayDisableOnInteraction: false,
                 onTap: (index) {
-                  String url = '';
                   if (picList[index].url.isNotEmpty) {
-                    url =
-                        '/web?url=${Uri.encodeComponent(picList[index].url)}&title=${Uri.encodeComponent(picList[index].title ?? '护卡宝')}';
-                    Application.run(context, url);
+                    Application.run(context, "/web",url: picList[index].url,title:picList[index].title ?? '护卡宝');
                   }
                 },
               ),
