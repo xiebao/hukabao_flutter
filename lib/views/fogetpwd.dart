@@ -157,13 +157,11 @@ class fogetpwdPageState extends State<fogetpwdPage> {
         });
       },
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
         filled: true,
         hintText: "请输入密码",
         helperText: "请输入至少6位密码",
-        helperStyle: TextStyle(fontSize: 8),
         icon: Icon(Icons.lock) ,
-        hintStyle: TextStyle(fontSize: 10),
         fillColor: Colors.white,
         errorStyle: TextStyle(fontSize: 8),
         suffixIcon: GestureDetector(
@@ -187,16 +185,13 @@ class fogetpwdPageState extends State<fogetpwdPage> {
     return TextFormField(
 //      autovalidate: true,
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
         icon: Icon(Icons.phone) ,
         hintText:  "请输入手机号码",
-        hintStyle: TextStyle(fontSize: 10),
         filled: true,
         fillColor: Colors.white,
-        errorStyle: TextStyle(fontSize: 8),
       ),
 //      style: Theme.of(context).textTheme.headline,
-      style: new TextStyle(fontSize: GlobalConfig.formfontSize),
       maxLines: 1,
       maxLength: 11,
       //键盘展示为号码
@@ -225,12 +220,10 @@ class fogetpwdPageState extends State<fogetpwdPage> {
     var node = new FocusNode();
     Widget verifyCodeEdit = new TextFormField(
 //      autovalidate: true,
-      style: new TextStyle(fontSize: GlobalConfig.formfontSize),
-      decoration: new InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+       decoration: new InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
         icon: Icon(Icons.assignment_late) ,
         hintText:  "请输入验证码",
-        hintStyle: TextStyle(fontSize: 10),
         filled: true,
         fillColor: Colors.white,
         errorStyle: TextStyle(fontSize: 8),

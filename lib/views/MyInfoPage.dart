@@ -140,7 +140,8 @@ String _token;
         break;
       case 2:
 //        是一张图来的   String img_url = "${GlobalConfig.webbase}CreditCard/myqrCode/token/";
-          Application.run(context, "/web",url: "${GlobalConfig.webbase}/CreditCard/myqrCode/token/",title: '我的邀请码');
+//          Application.run(context, "/web",url: "${GlobalConfig.webbase}/CreditCard/myqrCode/token/",title: '我的邀请码');
+          Application.router.navigateTo(context, "/share");
 
         break;
       case 3:
