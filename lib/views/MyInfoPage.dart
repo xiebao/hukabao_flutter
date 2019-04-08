@@ -157,7 +157,7 @@ String _token;
         Application.router.navigateTo(context, "/share");
         break;
       case 7:
-        DialogUtils.close2Logout(context);
+        DialogUtils.close2Logout(context,cancel:true);
         break;
 
     }
@@ -183,22 +183,4 @@ String _token;
       }
 
   }
-/*
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(MyInfoPage oldWidget) {
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-  }*/
 }

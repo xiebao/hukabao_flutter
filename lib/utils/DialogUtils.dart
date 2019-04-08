@@ -7,7 +7,7 @@ import '../routers/application.dart';
 import '../model/globle_model.dart';
 import '../globleConfig.dart';
 
-class DialogUtils {
+class DialogUtils extends Dialog {
   /// 显示文字对话框
   static showToastDialog(context, {text, duration}) {
     showDialog<Null>(
@@ -43,7 +43,7 @@ class DialogUtils {
     Navigator.pop(context);
   }
 
-  static close2Logout(context) async {
+  static close2Logout(context,{bool cancel=false}) async {
     showDialog<Null>(
       context: context,
       barrierDismissible: false,
@@ -57,19 +57,25 @@ class DialogUtils {
             ),
             content: new Text('请重新登录！'),
             actions: <Widget>[
+               new FlatButton(
+                child:  Text(cancel ?"取消":''),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
               new FlatButton(
                   onPressed: () async {
                     final model = globleModel().of(context);
                     await model.setlogout().then((_) {
                       print('正在退出……');
-                    }).whenComplete(() {
+                    });
+
                       print(" logout, 重新登录");
                       Navigator.of(context).pop();
                       /* Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
                     builder: (BuildContext context) => LoginPage()), ( //跳转到主页
                     Route route) => route == null);*/
                       Application.run(context, "/login");
-                    });
                   },
                   child: new Text('确定')),
             ],
@@ -102,31 +108,56 @@ class DialogUtils {
   }
 
   // 显示加载对话框
-  static showProgressIndicator(context, vl) {
+  static Future  showProgressIndicator(context, vl) {
     showDialog<Null>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-            title: Text("${GlobalConfig.appName}温馨提示"),
-            content: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                children: <Widget>[
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(vl > 0.8
-                          ? "App准备退出，稍后请重启App！安装……，"
-                          : "已下载：${(vl * 100).toStringAsFixed(0)}%")),
-                  LinearProgressIndicator(
-                    backgroundColor: Colors.blue,
-                    value: vl,
-                    semanticsLabel: '正在下载新版本……',
-                    valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      builder: (context) => showDowningIndocator(label: vl),
     );
   }
+}
+
+class showDowningIndocator extends StatefulWidget {
+  final label;
+  showDowningIndocator({Key key, this.label}) : super(key: key);
+
+  @override
+  showIndocatorState createState() => new showIndocatorState();
+}
+
+class showIndocatorState extends State<showDowningIndocator> {
+  double _label ;
+  @override
+  void initState() {
+    super.initState();
+    _label = widget.label;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("${GlobalConfig.appName}温馨提示"),
+      content: Container(
+        padding: const EdgeInsets.all(10.0),
+        alignment: Alignment.center,
+        height: 300,
+        child: Column(
+          children: <Widget>[
+            Align(
+                alignment: Alignment.centerLeft,
+                child: Text(_label > 0.8
+                    ? "App准备退出，稍后请重启App！安装……，"
+                    : "已下载：${(_label * 100).toStringAsFixed(0)}%")),
+            LinearProgressIndicator(
+              backgroundColor: Colors.blue,
+              value: _label,
+              semanticsLabel: '正在下载新版本……',
+              valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 }

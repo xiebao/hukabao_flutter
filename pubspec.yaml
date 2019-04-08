@@ -26,8 +26,8 @@ dependencies:
 
 
   shared_preferences: 0.4.3
-  #  高版本的dio interceptors可以使用，但是在flutter33.1版本post方法存在问题
-  dio: ^1.0.17
+  #  高版本的dio interceptors可以使用，但是在flutter33.1版本post方法存在问题   dio: ^1.0.17
+  dio: ^2.1.0
   json_serializable: ^2.0.2
 
   flutter_picker: ^1.0.8

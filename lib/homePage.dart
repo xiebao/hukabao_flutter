@@ -45,14 +45,10 @@ class homePageState extends State<homePage>
   List<PicsCell> _picList = [];
 
   void _initPicList() async {
-    HttpUtils.request('Index/cardIndex', data: {}, method: 'post')
-        .then((response) {
+    await HttpUtils.apipost(context,'Index/cardIndex',{},(response) {
       print("----------------adList--------------------");
       PicsCell dd;
       print(response['data']['adList']);
-      /*  if(response['data']['cardList'])
-        _userName=response['data']['cardList'][0]['name'];
-*/
       setState(() {
         response['data']['adList'].forEach((ele) {
           dd = PicsCell(

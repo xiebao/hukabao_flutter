@@ -18,6 +18,39 @@ class SplashState extends State<SplashPage> {
 
   void _checkUpdateApp() async {
     if (await UpdateApp().checkDownloadApp) {
+      _isupdate= await DialogUtils().showMyDialog(context, '有更新版本，是否马上更新?');
+      print(_isupdate);
+      if (!_isupdate) {
+        timer = Timer(const Duration(milliseconds: 1500), () async {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          var token = prefs.getString('token') ?? '';
+          if (token == '')
+            Application.run(context, "/login");
+          else {
+            final model = globleModel().of(context);
+            print("------------${model.token}---------------");
+            await HttpUtils.apipost(context, 'User/userInfo', {},
+                    (response) async {
+                  print(response);
+                  if (response["error_code"].toString() == '1') {
+                    await model
+                        .setlogin(token, response["userinfo"])
+                        .whenComplete(() {
+                      Application.run(context, "/home");
+                    });
+                  } else
+                    Application.run(context, "/login");
+                });
+          }
+        });
+      } else {
+       await UpdateApp().webdownload(context);
+      }
+    }
+  }
+/*
+  void _checkUpdateApp() async {
+    if (await UpdateApp().checkDownloadApp) {
       await DialogUtils().showMyDialog(context, '有更新版本，是否马上更新?').then((rv) {
         _isupdate = rv ? true : false;
       }).whenComplete(() {
@@ -33,18 +66,18 @@ class SplashState extends State<SplashPage> {
               print(
                   "--------welpage----------${model.token}--------------------------");
               await HttpUtils.apipost(context, 'User/userInfo', {},
-                  (response) async {
-                print('=================userInfo======================');
-                print(response);
-                if (response["error_code"].toString() == '1') {
-                  await model
-                      .setlogin(token, response["userinfo"])
-                      .whenComplete(() {
-                    Application.run(context, "/home");
-                  });
-                } else
-                  Application.run(context, "/login");
-              }).whenComplete(() {
+                      (response) async {
+                    print('=================userInfo======================');
+                    print(response);
+                    if (response["error_code"].toString() == '1') {
+                      await model
+                          .setlogin(token, response["userinfo"])
+                          .whenComplete(() {
+                        Application.run(context, "/home");
+                      });
+                    } else
+                      Application.run(context, "/login");
+                  }).whenComplete(() {
                 print('whenComplete');
               });
             }
@@ -55,7 +88,7 @@ class SplashState extends State<SplashPage> {
       });
     }
   }
-
+  */
   @override
   void initState() {
     super.initState();

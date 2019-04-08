@@ -13,20 +13,22 @@ class DataUtils {
   static Future<List<ModelCell>> getIndexModelListData(
       Map<String, dynamic> params) async {
     List<ModelCell> resultList = new List();
-    var response = await HttpUtils.request('Public/getAppModel',
-        data: params, method: 'post');
-    var responseList = response['data'];
-    try {
-      for (int i = 0; i < responseList.length; i++) {
-        ModelCell bookCell;
 
-        bookCell = ModelCell.fromJson(responseList[i]);
+    await HttpUtils.post(null,'Public/getAppModel',(response) {
+      var responseList = response['data'];
+      try {
+        for (int i = 0; i < responseList.length; i++) {
+          ModelCell bookCell;
+
+          bookCell = ModelCell.fromJson(responseList[i]);
 //        print(bookCell.modName);
-        resultList.add(bookCell);
+          resultList.add(bookCell);
+        }
+      } catch (e) {
+        return [];
       }
-    } catch (e) {
-      return [];
-    }
+    },params:params);
+
     return resultList;
   }
 
@@ -54,19 +56,21 @@ class DataUtils {
   static Future<List<BookCell>> getBookListData(
       Map<String, dynamic> params) async {
     List<BookCell> resultList = new List();
-    var response =
-        await HttpUtils.request('User/cardList', data: params, method: 'post');
-    var responseList = response['d'];
-    for (int i = 0; i < responseList.length; i++) {
-      BookCell bookCell;
-      try {
-        bookCell = BookCell.fromJson(responseList[i]);
-      } catch (e) {
-        print("error $e at $i");
-        continue;
+//    var response =  await HttpUtils.request('User/cardList', data: params, method: 'post');
+    await HttpUtils.post(null,'Public/getAppModel',(response) {
+      var responseList = response['d'];
+      for (int i = 0; i < responseList.length; i++) {
+        BookCell bookCell;
+        try {
+          bookCell = BookCell.fromJson(responseList[i]);
+        } catch (e) {
+          print("error $e at $i");
+          continue;
+        }
+        resultList.add(bookCell);
       }
-      resultList.add(bookCell);
-    }
+
+    },params:params);
 
     return resultList;
   }

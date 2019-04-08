@@ -27,6 +27,16 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+               <!-- <data>
+                    andriod:scheme="scheme1"
+                    andriod:host="host1"
+                    andriod:path="/path1"
+                    andriod:port="8080"
+                </data>-->
+                <!--【群主】JarvanMo|大连|Android(468122151)  15:53:16
+但是iOS要在info.plist里声明可以
+Android要在manifest里设置intent
+【吐槽】ted|昆明|前后(303221209)  15:53:43-->
             </intent-filter>
         </activity>
     </application>

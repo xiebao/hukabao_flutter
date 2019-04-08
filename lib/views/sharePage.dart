@@ -6,7 +6,6 @@ import '../utils/comUtil.dart';
 import '../utils/HttpUtils.dart';
 import '../model/index_model.dart';
 import '../model/globle_model.dart';
-import '../globleConfig.dart';
 import 'package:fluwx/fluwx.dart' as fluwx;
 
 class sharePage extends StatefulWidget {
@@ -27,13 +26,11 @@ class sharePageState extends State<sharePage> {
     _userid = model.userinfo.id;
     _userName = model.userinfo.name;
 
-    HttpUtils.request('Share/getWxShareImgs', data: {}, method: 'post')
-        .then((response) {
+   await HttpUtils.apipost(context,'Share/getWxShareImgs',{},(response) {
       print("----------------Share/getWxShareImgs--------------------");
       print(response['data']);
-      print(response);
-
-      print(response['index'] ?? '0'); // response['index']是动态变量 --当前默认的序号
+//      print(response);
+//      print(response['index'] ?? '0'); // response['index']是动态变量 --当前默认的序号
 //      _defindex=int.parse(response['index'].toString()??'1') ?? 0;//======bug?????????????????
       PicsCell dd;
       response['data'].forEach((ele) {
@@ -44,6 +41,7 @@ class sharePageState extends State<sharePage> {
 //        _isRequesting = true;
       setState(() {});
     });
+
   }
 
   @override
@@ -80,10 +78,11 @@ class sharePageState extends State<sharePage> {
   }
 
   Widget _initSwiper() {
+
     if (_picList == null || _picList == [])
-      Text('没有发现分享图片');
+      return Text('没有发现分享图片');
     else {
-      _picList.length == 1
+      return _picList.length == 1
           ? Image.network(
               _picList[0].imgurl,
               fit: BoxFit.fill,

@@ -50,9 +50,9 @@ class LoginPageState extends State<LoginPage> {
       Map<String, String> params = {
         "code": code,
       };
-      HttpUtils().post('WxAuth/userWxInfo', (response) async {
+      showLoadingDialog();
+      await HttpUtils.post(context,'WxAuth/userWxInfo', (response) async {
         print("----------------get userWxInfo--------------------");
-        showLoadingDialog();
 
         print(response['data']);
         if (response['data']['unionid'].toString() != '') {
@@ -65,11 +65,14 @@ class LoginPageState extends State<LoginPage> {
           setState(() {
             _loading = true;
           });
-          _checkWxlogin(_unionId, response['data']['nickname']);
+          await _checkWxlogin(_unionId, response['data']['nickname']);
+
         } else {
           _alertmag("微信认证失败!");
+          setState(() {
+            _loading = false;
+          });
         }
-
         /*
         *{openid: oEJBM1crLLjW1lGFM5aoGs6id0ok, nickname: 努力吧, sex: 0, language: zh_CN, city: , province: , country: , headimgurl: http://thirdwx.qlogo.cn/mmopen/vi_32/666ZxTwTYHUu57JWG5trN0vMjt7icY9WrByHPL9Vtjic3S77k8yOHBswkVGZ0jhBUeAWFYNlIfMsSXKd3khEZKpQ/132, privilege: [], unionid: omxDS1GXNd_q74TIAsdblxFSDw4s}
         * */
@@ -90,8 +93,12 @@ class LoginPageState extends State<LoginPage> {
     super.initState();
     fluwx.responseFromAuth.listen((response) {
       print('微信登录回调');
-      print(response.code);
-      _userWxInfo(response.code);
+      print(response.errCode);
+      if(response.errCode==0){
+        print(response.code);
+        _userWxInfo(response.code);
+      }
+
     });
   }
 
@@ -106,7 +113,7 @@ class LoginPageState extends State<LoginPage> {
     _wxuserInfo = null;
   }
 
-  void _login() {
+  void _login() async {
     var _phone = _phonecontroller.text.trim();
     var _pwd = _pwdcontroller.text.trim();
     var pdata = {
@@ -121,7 +128,7 @@ class LoginPageState extends State<LoginPage> {
     try {
       showLoadingDialog();
       print(pdata);
-      HttpUtils().post(
+      await HttpUtils.post(context,
           "Public/Login",
           (response) async {
             print(response);
@@ -129,22 +136,20 @@ class LoginPageState extends State<LoginPage> {
               String token = response["userinfo"]["token"];
               print(response["userinfo"]);
               if (token != null && token.trim() != "") {
-                _loginok(token, response["userinfo"]);
+                await _loginok(token, response["userinfo"]);
               } else {
                 _alertmag("登录失败)");
               }
             } else {
               _alertmag("账号或密码错误");
             }
+
+            hideLoadingDialog();
           },
-          params: pdata,
-          errorCallBack: (errorMsg) {
-            print("error:" + errorMsg);
-          });
+          params: pdata);
     } catch (e) {
       print(e);
       DialogUtils.showToastDialog(context, text: '网络连接错误');
-    } finally {
       hideLoadingDialog();
     }
   }
@@ -155,12 +160,12 @@ class LoginPageState extends State<LoginPage> {
       var pdata = {
         "unionid": unionId,
       };
-      HttpUtils().post(
+     await HttpUtils.post(context,
           "Public/checkWx",
           (response) async {
             print(response);
             if (response["error_code"] == 1) {
-              _loginok(response["userinfo"]["token"], response["userinfo"]);
+             await _loginok(response["userinfo"]["token"], response["userinfo"]);
             } else {
               _alertmag("未绑定，请输入账户登录绑定");
               setState(() {
@@ -169,10 +174,7 @@ class LoginPageState extends State<LoginPage> {
               });
             }
           },
-          params: pdata,
-          errorCallBack: (errorMsg) {
-            print("error:" + errorMsg);
-          });
+          params: pdata);
     } catch (e) {
       print(e);
       DialogUtils.showToastDialog(context, text: '微信认证异常，请重试');

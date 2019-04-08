@@ -29,7 +29,7 @@ String _userIdNo;
   TabController _tabController;
 
   _loadData() async {
-    if (_mounted && _cardsList1.isNotEmpty) return;
+    if (_mounted ) return;
     HttpUtils.apipost(context, 'Index/cardListIndex', {}, (response) {
       print('=================cardLists======================');
       response['data']['cardList'].forEach((ele) {
@@ -71,155 +71,156 @@ String _userIdNo;
   _SelectView(IconData icon, String text, String id) {
     return new PopupMenuItem<String>(
         value: id,
-        child: new Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            new Icon(icon, color:GlobalConfig.mainColor),
-            new Text(text),
-          ],
+        child: Container(
+          child: new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              new Icon(icon, color:GlobalConfig.mainColor),
+              new Text(text),
+            ],
+          ),
         )
     );
   }
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('卡片管理'),
-        centerTitle: true,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: new AppBar(
+          title: new Text('卡片管理'),
+          centerTitle: true,
 //        重写返回按钮，
-        leading:IconButton(icon: Icon(Icons.arrow_back), onPressed: (){ Application.run(context, "/");}),
-        bottom: new TabBar(
-          tabs: <Widget>[
-            new Text('储蓄卡'),
-            new Text('信用卡'),
-          ],
-          controller: _tabController,
-        ),
-        actions: <Widget>[
-         /* // 非隐藏的菜单
-          IconButton(
-          icon: Icon(Icons.playlist_play),
-          tooltip: 'Air it',
-          onPressed: null,
-          ),
-*/
-          // 隐藏的菜单
-          new PopupMenuButton<String>(
-            itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-              _SelectView(Icons.message, '设为默认', 'A'),
-              _SelectView(Icons.group_add, '修改', 'B'),
-              _SelectView(Icons.cast_connected, '删除', 'C'),
+          leading:IconButton(icon: Icon(Icons.arrow_back), onPressed: (){ Application.run(context, "/");}),
+          flexibleSpace:null,
+          bottom: TabBar(
+            labelPadding:EdgeInsets.symmetric( horizontal: 38),
+            tabs: <Widget>[
+              new Tab(text:'储蓄卡',icon: Icon(Icons.card_giftcard),),
+              new Tab(text:'信用卡',icon: Icon(Icons.credit_card),),
             ],
-            onSelected: (String action) {
-              // 点击选项的时候
-              print(action);
-              switch (action) {
-                case 'A':
-                  if (_curCardId!='' && _curType=='1'){
-                    Map<String, String> params = {
-                      "cardId": _curCardId,
-                    };
-                    HttpUtils.apipost(context, 'User/setDefaultcard', params, (response) {
-                      print('=================setDefaultcard======================');
-                      DialogUtils.showToastDialog(context, text: response['message']);
-                      if (response['error_code'] == '1'){
-                        setState(() {
-                          _mounted = false;
-                          _loadData();
-                        });
-                      };
-                    });
-                  }else
-                    DialogUtils.showToastDialog(context, text: "请长按卡片选择");
-
-                  break;
-                case 'B':
-                  if (_curCardId!=''){
-                    Map<String, String> params = {
-                      "cardId": _curCardId,
-                    };
-                    HttpUtils.apipost(context, 'User/cardDelete', params, (response) {
-                      print('=================cardDelete======================');
-                      DialogUtils.showToastDialog(context, text: response['message']);
-                      if (response['error_code'] == '1'){
-                        setState(() {
-                          _mounted = false;
-                          _loadData();
-                        });
-                      };
-                    });
-                  }else
-                    DialogUtils.showToastDialog(context, text: "请长按卡片选择");
-
-                  break;
-                case 'C':
-                  break;
-              }
-            },
+            controller: _tabController,
           ),
-        ],
-      ),
-      body: new TabBarView(
-        controller: _tabController,
-        children: <Widget>[
-          /*  new Center(
+
+          actions: <Widget>[
+            // 隐藏的菜单
+            new PopupMenuButton<String>(
+              itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                _SelectView(Icons.favorite, '设为默认', 'A'),
+                _SelectView(Icons.delete, '删除', 'B'),
+              ],
+              onSelected: (String action) {
+                // 点击选项的时候
+                print(action);
+                switch (action) {
+                  case 'A':
+                    if (_curCardId!='' && _curType=='1'){
+                      Map<String, String> params = {
+                        "cardId": _curCardId,
+                      };
+                      HttpUtils.apipost(context, 'User/setDefaultcard', params, (response) {
+                        print('=================setDefaultcard======================');
+                        DialogUtils.showToastDialog(context, text: response['message']);
+                        if (response['error_code'] == '1'){
+                          setState(() {
+                            _mounted = false;
+                            _loadData();
+                          });
+                        };
+                      });
+                    }else
+                      DialogUtils.showToastDialog(context, text: "请长按卡片选择");
+
+                    break;
+                  case 'B':
+                    if (_curCardId!=''){
+                      Map<String, String> params = {
+                        "cardId": _curCardId,
+                      };
+                      HttpUtils.apipost(context, 'User/cardDelete', params, (response) {
+                        print('=================cardDelete======================');
+                        DialogUtils.showToastDialog(context, text: response['message']);
+                        if (response['error_code'] == '1'){
+                          setState(() {
+                            _mounted = false;
+                            _loadData();
+                          });
+                        };
+                      });
+                    }else
+                      DialogUtils.showToastDialog(context, text: "请长按卡片选择");
+
+                    break;
+                  case 'C':
+                    break;
+                }
+              },
+            ),
+          ],
+        ),
+        body: new TabBarView(
+          controller: _tabController,
+          children: <Widget>[
+            /*  new Center(
               child: new Tab(
             icon: new Icon(Icons.directions_bike),
           )),*/
-          new Center(
-            child: new Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 18.0,
-              ),
-              child: ListView.builder(
-                itemCount: _cardsList1.length,
-                itemBuilder: (context, index) {
-                 return _cardShow( Page(label: '储蓄卡'),_cardsList1[index]);
-
-                },
-              ),
-            ),
-          ),
-          new Center(
+            new Center(
               child: new Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 18.0,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 18.0,
+                ),
+                child: ListView.builder(
+                  itemCount: _cardsList1.length,
+                  itemBuilder: (context, index) {
+                    return _cardShow( Page(label: '储蓄卡'),_cardsList1[index]);
+
+                  },
+                ),
+              ),
             ),
-            child: ListView.builder(
-              itemCount: _cardsList2.length,
-              itemBuilder: (context, index) {
-                return _cardShow(Page(label: '信用卡'),_cardsList2[index]);
-              },
-            ),
-          )
+            new Center(
+                child: new Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 18.0,
+                  ),
+                  child: ListView.builder(
+                    itemCount: _cardsList2.length,
+                    itemBuilder: (context, index) {
+                      return _cardShow(Page(label: '信用卡'),_cardsList2[index]);
+                    },
+                  ),
+                )
 //              child: new Tab(
 //            icon: new Icon(Icons.directions_boat),
 //          )
-              ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: Icon(Icons.add),
-        label: Text("添加"),
-        onPressed: () {
-          var cdtp = _tabController.index;
-          print("添加" + cdtp.toString());
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => addCard(cardType: (cdtp + 1).toString(),userName: _userName,UserIdNo:_userIdNo),
             ),
-          ).then((result) {
-            print(result);
-            if (result == '1') {
-              _mounted = false;
-              _loadData();
-            }
-          });
-        },
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          icon: Icon(Icons.add),
+          label: Text("添加"),
+          onPressed: () {
+            var cdtp = _tabController.index;
+            print("添加" + cdtp.toString());
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => addCard(cardType: (cdtp + 1).toString(),userName: _userName,UserIdNo:_userIdNo),
+              ),
+            ).then((result) {
+              print(result);
+              if (result == '1') {
+                _mounted = false;
+                _loadData();
+              }
+            });
+          },
+        ),
       ),
-    );
+    ) ;
   }
+
 
    Widget _cardShow(Page page,  BookCell data){
     return InkWell(

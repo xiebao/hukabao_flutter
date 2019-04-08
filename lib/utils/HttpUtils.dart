@@ -1,12 +1,13 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity/connectivity.dart';
 import '../globleConfig.dart';
 import '../utils/DialogUtils.dart';
 import '../routers/application.dart';
+
 class HttpUtils {
   /// global dio object
   static Dio dio;
@@ -14,16 +15,16 @@ class HttpUtils {
   /// default options
   static const String API_PREFIX = 'http://app.hukabao.com/index.php/Api/';
   static const int CONNECT_TIMEOUT = 10000;
-  static const int RECEIVE_TIMEOUT = 5000;
+  static const int RECEIVE_TIMEOUT = 10000;
   static const CONTENT_TYPE_JSON = "application/json";
   static const CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
 
   /// http request methods
-  static const String GET = 'get';
-  static const String POST = 'post';
-  static const String PUT = 'put';
-  static const String PATCH = 'patch';
-  static const String DELETE = 'delete';
+  static const String GET = 'GET';
+  static const String POST = 'POST';
+  static const String PUT = 'PUT';
+  static const String PATCH = 'PATCH';
+  static const String DELETE = 'DELETE';
 
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -36,6 +37,7 @@ class HttpUtils {
       dio.options.baseUrl = GlobalConfig.base;
       dio.options.connectTimeout = CONNECT_TIMEOUT;
       dio.options.receiveTimeout = RECEIVE_TIMEOUT;
+      dio.options.contentType = ContentType.parse(CONTENT_TYPE_FORM);
 /*
       dio.interceptors
           .add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
@@ -69,7 +71,7 @@ class HttpUtils {
 
   // 获取安装地址
   Future<String> get theToken async {
-    final SharedPreferences prefs  = await _prefs;
+    final SharedPreferences prefs = await _prefs;
     var token = prefs.getString('token') ?? '';
     return token;
   }
@@ -81,187 +83,183 @@ class HttpUtils {
     return token;
   }
 */
-
-  /// request method
-  static Future<Map> request(String url, {data, method, context}) async {
-    data = data ?? {};
-//    method = method ?? 'GET';
-
-    if (method == GET) {
-      //组合GET请求的参数
-      if (data != null && data.isNotEmpty) {
-        StringBuffer sb = new StringBuffer("?");
-        data.forEach((key, value) {
-          sb.write("$key" + "=" + "$value" + "&");
-        });
-        String paramStr = sb.toString();
-        paramStr = paramStr.substring(0, paramStr.length - 1);
-        url += paramStr;
-      }
-/*
-    /// restful 请求处理
-    /// /gysw/search/hist/:user_id        user_id=27
-    /// 最终生成 url 为     /gysw/search/hist/27
-    data.forEach((key, value) {
-      if (url.indexOf(key) != -1) {
-        url = url.replaceAll(':$key', value.toString());
-      }
-    });
-*/
-    } else {
-      if (data != null && data.isNotEmpty) {
-        data = FormData.from(data);
-      } else {
-        data = FormData.from({});
-      }
-    }
-
-    /// 打印请求相关信息：请求地址、请求方式、请求参数
-    print('请求地址：【' + method + '  ' + url + '】');
-    print('请求参数：' + data.toString());
-
-    Dio dio = createInstance();
-
-    var token = await HttpUtils().theToken;
-    dio.options.headers = {
-      'access-token': token,
-    };
-
-    var result;
-    try {
-      Response response = await dio.request(GlobalConfig.base + url,
-          data: data, options: new Options(method: method));
-
-      var statusCode = response.statusCode;
-      //处理错误部分
-      if (statusCode < 0) {
-        var errorMsg = "网络请求错误,状态码:" + statusCode.toString();
-        print(errorMsg);
-//        _handError(errorCallBack, errorMsg);
-
-      }
-
-      result = response.data;
-
-      /// 打印响应相关信息
-      print('响应数据：' + response.toString());
-      if (response.data["error_code"] == '-2' && context) {
-        print('error_code==-2,重新登录1');
-        DialogUtils.close2Logout(context);
-      }
-    } on DioError catch (e) {
-      /// 打印请求失败相关信息
-      print('请求出错：' + e.toString());
-    }
-
-    return result;
-  }
-
   //get请求
   void get(String url, Function callBack,
-      {Map<String, String> params, Function errorCallBack}) async {
-    _request(url, callBack,
-        method: GET, params: params, errorCallBack: errorCallBack);
+      {Map<String, dynamic> params, Function errorCallBack}) async {
+    await _request(url, callBack,
+        method: GET,
+        params: params,
+        errorCallBack: errorCallBack,
+        withToken: false);
+  }
+
+  //没有Token的 post请求
+  static post(BuildContext context, String url, Function callBack,
+      {Map<String, dynamic> params}) async {
+    dio = createInstance();
+    if (params == null || params.isEmpty) {
+      params = {};
+    }
+    print("- dio--request-ing-11111--");
+    try {
+      Response response = await dio.post(GlobalConfig.base + url,
+          data: params,
+          options: new Options(
+              contentType:
+                  ContentType.parse("application/x-www-form-urlencoded")));
+
+      int statusCode = response.statusCode;
+      if (statusCode < 0) {
+        String errorMsg = "网络请求错误,状态码:" + statusCode.toString();
+        _handError(context,errorMsg);
+      }
+
+      if (response.data["error_code"].toString() == '-2') {
+        await  DialogUtils.close2Logout(context);
+      }
+
+      if (callBack != null) {
+        callBack(response.data);
+      } else {
+        _handError(context,'请求成功',);
+      }
+    } catch (e) {
+      print('请求异常:' + e.toString());
+    }
   }
 
   //post请求
-  void post(String url, Function callBack,
-      {Map<String, String> params, Function errorCallBack}) async {
-    _request(url, callBack,
-        method: POST, params: params, errorCallBack: errorCallBack);
-  }
-
-  //post请求
-  static Future<Map> apipost(BuildContext context, String url,
-      Map<String, String> params, Function callBack) async {
-    _request(url, callBack, method: POST, params: params, context: context);
+  static apipost(BuildContext context, String url, Map<String, dynamic> params,
+      Function callBack) async {
+    await _request(url, callBack, method: POST, params: params, context: context);
   }
 
   //具体的还是要看返回数据的基本结构
   static void _request(String url, Function callBack,
       {String method,
-      Map<String, String> params,
+      Map<String, dynamic> params,
       Function errorCallBack,
-      BuildContext context}) async {
+      BuildContext context,
+      bool withToken = true}) async {
     print("<net---> url :<" + method + ">" + url);
-
     if (params != null && params.isNotEmpty) {
       print("<net> params :" + params.toString());
     }
 
     String errorMsg = "";
-    int statusCode;
-
     var connectivityResult = await (new Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
     } else if (connectivityResult == ConnectivityResult.wifi) {
     } else if (connectivityResult == ConnectivityResult.none) {
       errorMsg = "请检查网络";
       print("请检查网络");
-      _handError(errorMsg, errorCallback: errorCallBack, context: context);
+      _handError(context,errorMsg);
     }
 
-    try {
-      dio = createInstance();
-      String token =    await HttpUtils().theToken;
+    dio = createInstance();
+    if (withToken == true) {
+      String token = await HttpUtils().theToken;
       dio.options.headers = {
         'access-token': token,
       };
+    }
 
-      print("---_request-ing---");
-      if (method == GET) {
-        //组合GET请求的参数
-        if (params != null && params.isNotEmpty) {
-          /// restful 请求处理
-          params.forEach((key, value) {
-            if (url.indexOf(key) != -1) {
-              url = url.replaceAll(':$key', value.toString());
-            }
-          });
-        }
+    if (method == GET) {
+      //组合GET请求的参数
+      if (params != null && params.isNotEmpty) {
+        /// restful 请求处理
+        params.forEach((key, value) {
+          if (url.indexOf(key) != -1) {
+            url = url.replaceAll(':$key', value.toString());
+          }
+        });
       }
+    }
 
-      if (params == null || params.isEmpty) {
-        params = {};
-      }
+    if (params == null || params.isEmpty) {
+      params = {};
+    }
+    print("- dio--request-ing---");
 
+    try {
       Response response = await dio.request(GlobalConfig.base + url,
-          data: FormData.from(params), options: new Options(method: method));
-      statusCode = response.statusCode;
+          data: params, options: Options(method: method));
 
-      //处理错误部分
+      int statusCode = response.statusCode;
+
+      print("======dio request========$statusCode ==================");
       if (statusCode < 0 && errorCallBack != null) {
         errorMsg = "网络请求错误,状态码:" + statusCode.toString();
-        _handError(errorMsg, errorCallback: errorCallBack, context: context);
+        _handError(context,errorMsg);
       }
 
-      if (response.data["error_code"].toString() =='-2') {
-        print('error_code==-2,重新登录2');
-        DialogUtils.close2Logout(context);
+      if (response.data["error_code"].toString() == '-2') {
+        print('error_code==-2,重新登录2------');
+        await  DialogUtils.close2Logout(context);
       }
 
       if (callBack != null) {
         callBack(response.data);
+      } else {
+        _handError(context,'请求成功');
       }
-      else{
-        DialogUtils.showToastDialog('请求成功');
-      }
-
     } catch (exception) {
       if (errorCallBack != null)
-        _handError(exception.toString(),
-            errorCallback: errorCallBack, context: context);
+        _handError(context,exception.toString(),
+            errorCallback: errorCallBack );
     }
   }
 
   //处理异常
-  static void _handError(String errorMsg,
-      {BuildContext context, Function errorCallback}) {
+  static void _handError(BuildContext context,String errorMsg,
+      { Function errorCallback}) {
     print("<net> errorMsg :" + errorMsg);
     if (errorCallback != null) {
-      DialogUtils.showToastDialog(context);
-//      errorCallback(errorMsg);
+      DialogUtils.showToastDialog(context,text:errorMsg);
+    }
+      else
+        errorCallback(errorMsg);
+
+  }
+
+
+  //post请求测试
+  apiposttt(BuildContext context, String url, Map<String, String> params,
+      Function callBack) async {
+    dio = createInstance();
+    String token = await HttpUtils().theToken;
+    dio.options.headers = {
+      'access-token': token,
+    };
+
+    if (params == null || params.isEmpty) {
+      params = {};
+    }
+
+    print("- dio--request-ing-11111--");
+
+    try {
+      Response response = await dio.request(GlobalConfig.base + url,
+          data: FormData.from(params), options: new Options(method: "POST"));
+
+      int statusCode = response.statusCode;
+
+      print("======dio request========$statusCode ==================");
+
+      if (response.data["error_code"].toString() == '-2') {
+        print('error_code==-2,重新登录2------');
+        await  DialogUtils.close2Logout(context);
+      }
+
+      if (callBack != null) {
+        callBack(response.data);
+      } else {
+        DialogUtils.showToastDialog('请求成功');
+      }
+    } catch (e) {
+      print('dddddddddddd');
     }
   }
+
 
 }

@@ -20,15 +20,13 @@ class Application {
             appuri =
                 "/web?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title ?? '浏览')}";
 
-            await HttpUtils.request('Index/checktoken/token/$token',
-                    data: {}, method: 'post')
-                .then((response) {
+            await HttpUtils.apipost(context,'Index/checktoken/token/$token',{},(response) {
               if (response["error_code"].toString() == '1') {
                 router.navigateTo(context, appuri,
                     transition: TransitionType.fadeIn);
               } else
                 DialogUtils.close2Logout(context);
-            });
+            } );
           }
         });
       } else {
