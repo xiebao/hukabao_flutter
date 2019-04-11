@@ -33,7 +33,7 @@ class SplashState extends State<SplashPage> {
 
   void _checkUpdateApp() async {
     SharedPreferences prefs = await _prefs;
-    String isupdate ='';// prefs.getString('update') ?? '';
+    String isupdate =prefs.getString('update') ?? '';
     if (isupdate == '') {
       if (await UpdateApp().checkDownloadApp) {
         _isupdate = await DialogUtils().showMyDialog(context, '有更新版本，是否马上更新?');
