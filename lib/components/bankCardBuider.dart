@@ -48,7 +48,8 @@ class CardDataItem extends StatelessWidget {
   }
 
   Widget _firstRow() {
-    print(data);
+    print("===cardbuild _firstRow==");
+    print(data.cardName);
     return  ListTile(
           leading:
 //          Image.asset("images/bank/${data.cardIcon!='' ? data.cardIcon : 'unionpay'}.png")?? Image.asset("images/bank/unionpay.png"),

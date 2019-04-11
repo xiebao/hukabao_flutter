@@ -34,19 +34,24 @@ class sharePageState extends State<sharePage>
     await HttpUtils.apipost(context, 'Share/getWxShareImgs', {}, (response) {
       print("----------------Share/getWxShareImgs--------------------");
       print(response['data']);
-//      print(response);
-//      print(response['index'] ?? '0'); // response['index']是动态变量 --当前默认的序号
-//      _defindex=int.parse(response['index'].toString()??'1') ?? 0;//======bug?????????????????
-      PicsCell dd;
-      response['data'].forEach((ele) {
-        print(ele['imgurl']);
-        dd = PicsCell(imgurl: ele['imgurl']);
-        _picList.add(dd);
-      });
-
+      if (response['data'].isNotEmpty) {
+//        setState(() {
+//          _defindex = response['index'].toInteger();
+//        });
+        PicsCell dd;
+        response['data'].forEach((ele) {
+          if (ele.isNotEmpty) {
+            print(ele['imgurl']);
+//            _picList.add(PicsCell.fromJson(ele));
+            dd = PicsCell(imgurl: ele['imgurl']);
+            _picList.add(dd);
+          }
+        });
+      }
       setState(() {
         _isRequesting = true;
       });
+
     });
   }
 
