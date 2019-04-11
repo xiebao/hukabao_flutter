@@ -4,6 +4,7 @@ import '../utils/dataUtils.dart';
 import '../components/index_model_list.dart';
 import '../model/index_model.dart';
 import '../model/model_cell.dart';
+import '../utils/DialogUtils.dart';
 import '../views/swip_page.dart';
 
 class IndexPage extends StatefulWidget {
@@ -13,17 +14,15 @@ class IndexPage extends StatefulWidget {
   IndexPageState createState() => IndexPageState();
 }
 
-class IndexPageState extends State<IndexPage> with AutomaticKeepAliveClientMixin
-   {
-     @override
+class IndexPageState extends State<IndexPage>
+    with AutomaticKeepAliveClientMixin {
+  @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 
   List<ModelCell> _listData = new List();
 
-
   bool _isRequesting = false; //是否正在请求数据的flag
-
 
   void _initModelList() async {
     if (_isRequesting) return;
@@ -59,7 +58,7 @@ class IndexPageState extends State<IndexPage> with AutomaticKeepAliveClientMixin
   @override
   Widget build(BuildContext context) {
     EdgeInsets padding = MediaQuery.of(context).padding;
-    double top = math.max(padding.top , EdgeInsets.zero.top);
+    double top = math.max(padding.top, EdgeInsets.zero.top);
 
     return SafeArea(
       top: false,
@@ -68,20 +67,29 @@ class IndexPageState extends State<IndexPage> with AutomaticKeepAliveClientMixin
 //
 //      return Center(
 
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, top, 0, 10.0),
-              child: SwipPage(widget.picList),
-            ), //, //
-            Expanded(
-              child: IndexModelList(_listData),
+      child: !_isRequesting
+          ? Center(
+              child:
+              Image.asset(
+                'images/logo.png',
+                width: 100,
+                height: 100,
+              )
+//              DialogUtils.uircularProgress(),
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, top, 0, 10.0),
+                  child: SwipPage(widget.picList),
+                ), //, //
+                Expanded(
+                  child: IndexModelList(_listData),
+                ),
+              ],
             ),
-                      ],
-        ),
 //      ),
 //      body:  IndexModelList(_listData),
     );

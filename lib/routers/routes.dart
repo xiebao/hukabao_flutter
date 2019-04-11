@@ -17,6 +17,7 @@ class Routes {
   static String addCardPage = '/addcard';
   static String cardAdminPage = '/cardadmin';
   static String orderListPage = '/order';
+  static String omyMsgistPage = '/myMsg';
 
 
   static void configureRoutes(Router router) {
@@ -37,6 +38,7 @@ class Routes {
     router.define(sharePage, handler:sharePageHandler);
     router.define(payLogPage, handler: payLogPageHandler);
     router.define(orderListPage, handler:orderListPageHandler);
+    router.define(omyMsgistPage, handler: myMsgListPageHandler);
 
 
   }

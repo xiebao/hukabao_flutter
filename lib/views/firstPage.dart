@@ -4,7 +4,6 @@ import 'package:scoped_model/scoped_model.dart';
 import '../model/globle_model.dart';
 import '../utils/HttpUtils.dart';
 import '../components/loginButton.dart';
-import '../views/Detail.dart';
 import '../views/webViewnew.dart';
 
 class firstPage extends StatefulWidget {

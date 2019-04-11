@@ -17,7 +17,6 @@ class planPage extends StatefulWidget {
 
 class planPageState extends State<planPage> {
   GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  final FocusNode _focusNode = FocusNode();
 
   TextEditingController _amountCtroller = new TextEditingController();
   TextEditingController _startDayCtroller = new TextEditingController();
@@ -28,11 +27,12 @@ class planPageState extends State<planPage> {
   List<BookCell> _cardsList = [];
   int _indexcard = 0;
   String _curCardId;
-  String _orderNo,_smsSeq ;
+  String _orderNo, _smsSeq;
   List<PlanViewCell> _planViewList = List();
+  bool _isplanreg = false;
 
   TextEditingController _regCodeCtrl = TextEditingController();
-  bool _regclk=false;
+  bool _regclk = false;
 
   void _dataInit() async {
     if (_isRequesting) return;
@@ -78,125 +78,133 @@ class planPageState extends State<planPage> {
   }
 
   void _submitPlan() async {
-    bool isplanreg=true;
     if (_isRequesting)
       _curCardId = _cardsList[_indexcard].id;
     else
       return;
 
-    if (_curCardId.isEmpty)
-      DialogUtils.showToastDialog(context, text: "请选择卡片");
+    if (_curCardId.isEmpty){
+      DialogUtils.showToastDialog(context, "请选择卡片");
+      return;
+    }
 
-    if( _cardsList[_indexcard].planBanged!='1')
-      {
-        isplanreg=false;
-        await DialogUtils().showMyDialog(context, '卡片未激活注册计划，是否现在激活?')
-            .then((rv) async{
-          if (rv) {
-            Map<String, String> params = {
-              "cardId": _curCardId,
-            };
-            print("----_getsmsCode---");
-           await HttpUtils.apipost(context, "Index/extcardAddFirst", params, (response) {
-                print(response);
-                DialogUtils.showToastDialog(context, text: response['message']);
-                if (response['error_code'] == 1) {
-                  _orderNo = response['data']['orderNo'];
-                  _smsSeq = response['data']['smsSeq'];
-                }
+
+    _isplanreg = true;
+
+    if (_cardsList[_indexcard].planBanged != '1') {
+      await DialogUtils()
+          .showMyDialog(context, '卡片未激活注册计划，是否现在激活?')
+          .then((rv) async {
+        if (rv) {
+          Map<String, String> params = {
+            "cardId": _curCardId,
+          };
+          print("----_getsmsCode---");
+          await HttpUtils.apipost(context, "Index/extcardAddFirst", params,
+              (response) async{
+            print(response);
+             if (response['error_code'] == '1') {
+              _orderNo = response['data']['orderNo'];
+              _smsSeq = response['data']['smsSeq'];
+            }
+            await DialogUtils.showToastDialog(context, response['message']);
+
               }).then((_) {
-             showCardRegDialog().then((v){
-               if(v!=null && v!=''){
-                 List<String> msg= v.split(",");
-                 isplanreg= (msg[0]== '1' ? true:false);
-                 DialogUtils.showToastDialog(context, text: msg[1]);
-               }
+            showCardRegDialog().then((v) async{
+              if (v != null && v != '') {
+                List<String> msg = v.split(",");
+                setState(() {
+                  _isplanreg = (msg[0] == '1' ? true : false);
+                });
 
-             });
-           });
-          }
-        }).whenComplete(() {
-          if(isplanreg) _submit();
-        });
-      }
-      else
-        _submit();
+               await DialogUtils.showToastDialog(context, msg[1]);
+              }
+            });
+          });
+        }
+      });
+      if (_isplanreg) await _submit();
+    } else
+      await _submit();
   }
- void _submit() async{
-    try{
+
+  void _submit() async {
+    try {
       DateTime time1 = DateTime.parse(_startDayCtroller.text);
       DateTime time2 = DateTime.parse(_endDayCtroller.text);
       if (time1.isBefore(time2)) {
         Duration duration = time2.difference(time1);
         if (duration.inDays <= 2) {
-          DialogUtils.showToastDialog(context, text: "结束日期要在开始日期至少2日后");
+        await  DialogUtils.showToastDialog(context,  "结束日期要在开始日期至少2日后");
           return;
         }
       } else {
-        DialogUtils.showToastDialog(context, text: "开始日期必须早于结束日期");
+       await DialogUtils.showToastDialog(context,  "开始日期必须早于结束日期");
         return;
       }
+    } catch (e) {
+      await DialogUtils.showToastDialog(context,  "日期格式错误");
+      return;
     }
-    catch(e)
-   {
-     DialogUtils.showToastDialog(context, text: "日期格式错误");
-     return;
-   }
 
-
-   Map<String, String> params = {
-     "cardId": _curCardId,
-     "money": _amountCtroller.text,
-     "startTime": _startDayCtroller.text,
-     "endTime": _endDayCtroller.text,
-     "reserved": _bandCtroller.text,
-     "bondPer": "50"
-   };
-   print(params);
-   try {
-     showLoadingDialog();
-
-//      return;
-    await HttpUtils.apipost(context, 'Order/planAddOther', params, (response) {
-       print('=================Order/planAddOther======================');
+    final form = _formKey.currentState;
+    if (form.validate()) {
+      Map<String, String> params = {
+        "cardId": _curCardId,
+        "money": _amountCtroller.text,
+        "startTime": _startDayCtroller.text,
+        "endTime": _endDayCtroller.text,
+        "reserved": _bandCtroller.text,
+        "bondPer": "50"
+      };
+      print(params);
+      try {
+        showLoadingDialog();
+        await HttpUtils.apipost(context, 'Order/planAddOther', params,
+            (response) async{
+          print('=================Order/planAddOther======================');
 //          print(response['data']['info']);
-       if (response['error_code'] != "-1") {
-         response['data']['planList'].forEach((ele) {
+          hideLoadingDialog();
+          if (response['error_code'] != "-1") {
+            _planViewList=List();
+            response['data']['planList'].forEach((ele) {
 //              print("${ele['card_id']}|${ele['plan_money']}|${ele['plan_bond']}|${ele['plan_time']}|${ele['plan_test']}");
-           _planViewList.add(PlanViewCell.fromJson(ele));
-         });
+              _planViewList.add(PlanViewCell.fromJson(ele));
+            });
+            setState(() {
+              _isplanreg = false;
+            });
 
-         Navigator.push(
-           context,
-           MaterialPageRoute(
-             builder: (context) => planReviewPage(
-                 _planViewList,
-                 new PlanCell(
-                   cardNo: response['data']['info']['card'].toString(),
-                   planinfo: response['data']['info']['title'].toString(),
-                   planID: response['data']['planId'].toString(),
-                 )),
-           ),
-         );
-       } else
-         DialogUtils.showToastDialog(context, text: response['message']);
-     });
-   } catch (e) {
-     print(e);
-     DialogUtils.showToastDialog(context, text: '网络连接错误');
-   } finally {
-     hideLoadingDialog();
-   }
- }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => planReviewPage(
+                    _planViewList,
+                    PlanCell(
+                      cardNo: response['data']['info']['card'].toString(),
+                      planinfo: response['data']['info']['title'].toString(),
+                      planID: response['data']['planId'].toString(),
+                    )),
+              ),
+            );
+          } else
+           await DialogUtils.showToastDialog(context,  response['message']);
+        });
+      } catch (e) {
+        print(e);
+       await DialogUtils.showToastDialog(context, '网络连接错误');
+      }
+    }
+  }
+
   void _itemselected(int index) {
     print('第$index');
     print(_cardsList[index].cardName);
     setState(() {
       _indexcard = index;
       _curCardId = _cardsList[index].id;
-      _amountCtroller.text='';
-      _bandCtroller.text='';
-
+      _amountCtroller.text = '';
+      _bandCtroller.text = '';
     });
   }
 
@@ -250,175 +258,35 @@ class planPageState extends State<planPage> {
                             key: _formKey,
                             autovalidate: true,
                             child: SingleChildScrollView(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 5.0),
+                                padding: const EdgeInsets.all(5.0),
                                 child: Column(
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    const SizedBox(height: 10.0),
-//                                    _buildAmountText();
-                                    Stack(
-                                      alignment: new Alignment(1.0, 1.0),
-                                      //statck
-                                      children: <Widget>[
-                                        new Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    new EdgeInsets.fromLTRB(
-                                                        5.0, 0.0, 5.0, 0.0),
-                                                child: Text("目标金额:"),
-                                              ),
-                                              Expanded(
-                                                child: new TextField(
-                                                  textAlign: TextAlign.right,
-                                                  controller: _amountCtroller,
-                                                  cursorColor:
-                                                      GlobalConfig.mainColor,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  //光标切换到指定的输入框
-                                                  onEditingComplete: () =>
-                                                      FocusScope.of(context)
-                                                          .requestFocus(
-                                                              _focusNode),
-                                                  textDirection: TextDirection.ltr,
-                                                  decoration:
-                                                      new InputDecoration(
-                                                    hintText: '请输入计划金额',
-                                                    contentPadding:
-                                                        EdgeInsets.all(10.0),
-                                                  ),
-                                                ),
-                                              ),
-                                            ]),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10.0),
-                                    Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          new Expanded(
-                                            child: new TextField(
-                                              controller: _startDayCtroller,
-                                              // 光标颜色
-                                              cursorColor:
-                                                  GlobalConfig.mainColor,
-                                              style: TextStyle(fontSize: 14.0,),//输入文本的样式
-                                              decoration: new InputDecoration(
-                                                hintText: '开始时间',
-                                                suffixIcon: new IconButton(
-                                                  icon: new Icon(
-                                                      Icons.calendar_today,
-                                                      color: GlobalConfig
-                                                          .mainColor),
-                                                  onPressed: () {
-                                                    ComFunUtil.showDatePicker(
-                                                        context, (String data) {
-                                                      _startDayCtroller.text =
-                                                          data;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          new Padding(
-                                              padding: new EdgeInsets.fromLTRB(
-                                                  2.0, 0.0, 5.0, 0.0),
-                                              child: Text("至")),
-                                          new Expanded(
-                                            child: new TextField(
-                                              controller: _endDayCtroller,
-                                              // 光标颜色
-                                              cursorColor:
-                                                  GlobalConfig.mainColor,
-                                              style: TextStyle(fontSize: 14.0,),
-                                              decoration: new InputDecoration(
-                                                hintText: '结束时间',
-                                                suffixIcon: new IconButton(
-                                                  icon: new Icon(
-                                                      Icons.calendar_today,
-                                                      color: GlobalConfig
-                                                          .mainColor),
-                                                  onPressed: () {
-                                                    ComFunUtil.showDatePicker(
-                                                        context, (date) {
-                                                      _endDayCtroller.text =
-                                                          date;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        ]),
-                                    const SizedBox(height: 10.0),
-                                    Stack(
-                                      alignment: new Alignment(1.0, 1.0),
-                                      //statck
-                                      children: <Widget>[
-                                        new Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Padding(
-                                                padding:
-                                                    new EdgeInsets.fromLTRB(
-                                                        0.0, 0.0, 5.0, 0.0),
-                                                child: Text("预留额度:"),
-                                              ),
-                                              Expanded(
-                                                child: new TextField(
-                                                  controller: _bandCtroller,
-                                                  textAlign: TextAlign.right,
-                                                  textDirection: TextDirection.ltr,
-                                                  cursorColor:
-                                                      GlobalConfig.mainColor,
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  //光标切换到指定的输入框
-                                                  onEditingComplete: () =>
-                                                      FocusScope.of(context)
-                                                          .requestFocus(
-                                                              _focusNode),
-                                                  decoration:
-                                                      new InputDecoration(
-                                                    hintText: '请输入预留额度',
-                                                    contentPadding:
-                                                        EdgeInsets.all(10.0),
-                                                  ),
-                                                ),
-                                              ),
-                                            ]),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10.0),
+                                    _buildAmountText(),
+                                    const SizedBox(height: 5.0),
+                                    _buildBandText(),
+                                    const SizedBox(height: 5.0),
+                                    _buidPlanDaysRow(),
+                                    const SizedBox(height: 30.0),
                                     Container(
-                                      width: 340.0,
-                                      child: new Card(
+                                      width: 300.0,
+                                      child: FlatButton(
+                                        disabledColor: Colors.grey,
                                         color: GlobalConfig.mainColor,
-                                        elevation: 16.0,
-                                        child: FlatButton(
-                                          child: Padding(
-                                            padding: EdgeInsets.all(10.0),
-                                            child: Text(
-                                              '计划预览',
-                                              style: new TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 16.0),
-                                            ),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(10.0),
+                                          child: Text(
+                                            '计划预览',
+                                            style: new TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16.0),
                                           ),
-                                          onPressed: () {
-                                            _submitPlan();
-                                          },
                                         ),
+                                        onPressed:
+                                            _isplanreg ? _submitPlan : null,
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ))),
                       ),
@@ -428,63 +296,158 @@ class planPageState extends State<planPage> {
         ));
   }
 
-  Future<String> showCardRegDialog() {
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => new AlertDialog(
-            title: new Text("计划卡片激活注册"),
-            contentPadding: EdgeInsets.all(10.0),
-            content: Container(
-              height: 30,
-              child: Column(
-                children: <Widget>[
-                  Text('激活码'),
-                  TextField(
-                    controller: _regCodeCtrl,
-                    cursorColor: GlobalConfig.mainColor,
-                    maxLength: 6,
-                    keyboardType: TextInputType.phone,
-                    decoration: new InputDecoration(
-                      hintText: '请输入激活码',
-                      contentPadding: EdgeInsets.all(10.0),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text("取消"),
-                onPressed: () {
-                  Navigator.of(context).pop('');
-                },
-              ),
-              new FlatButton(
-                child: _regclk==true? Text('验证中…'): Text("确定"),
-                onPressed: () {
-                  if (_regCodeCtrl.text != '') {
-                    Map<String, String> params = {
-                      "cardId": _curCardId,
-                      "orderNo": _orderNo,
-                      "smsSeq": _smsSeq,
-                      "phoneCode": _regCodeCtrl.text.trim()
-                    };
-                    setState(() {
-                      _regclk=true;
-                    });
-
-                      HttpUtils.apipost(
-                          context, "Index/extcardAdd", params, (response) {
-                        print(response);
-                        Navigator.of(context).pop("${response['error_code']},${response['message']}");
-                      });
-
-                  }
-
-                }
-              )
-            ])) ?? '';
+  Widget _buildAmountText() {
+    return ComFunUtil().buideStandInput(context, '目标金额', _amountCtroller,
+        iType: 'number', maxlen: 6, showPlaceholder: false, valfun: (value) {
+      if (value.isEmpty || value.trim().length < 3 || value.trim().length > 7) {
+        return '';
+      }
+    }, changfun: (_) {
+      setState(() {
+        _isplanreg = true;
+      });
+    });
   }
 
+  Widget _buildBandText() {
+    return ComFunUtil().buideStandInput(context, '预留额度', _bandCtroller,
+        iType: 'number', maxlen: 5, showPlaceholder: false, valfun: (value) {
+      if (value.isEmpty || value.trim().length < 3 || value.trim().length > 5) {
+        return '';
+      }
+    }, changfun: (_) {
+      setState(() {
+        _isplanreg = true;
+      });
+    });
+  }
+
+  Widget _buidPlanDaysRow() {
+    return new Padding(
+      padding: const EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
+      child: new Row(
+        children: <Widget>[
+          Expanded(
+            flex: 6,
+            child: _buildStartDayText(),
+          ),
+          Expanded(
+            flex: 1,
+            child: SizedBox(
+              width: 10.0,
+            ), //Text('至')
+          ),
+          Expanded(
+            flex: 5,
+            child: _buildEndDayText(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStartDayText() {
+    return InkWell(
+      onTap: () {
+        ComFunUtil.showDatePicker(context, (String data) {
+          _startDayCtroller.text = data;
+        });
+      },
+      child: ComFunUtil().buideStandInput(context, '开始日', _startDayCtroller,
+          showPlaceholder: false,
+          valfun: (value) {
+            if (value.isEmpty) {
+              return '';
+            }
+          },
+          tapfun: true,
+          changfun: (_) {
+            setState(() {
+              _isplanreg = true;
+            });
+          }),
+    );
+  }
+
+  Widget _buildEndDayText() {
+    return InkWell(
+      onTap: () {
+        ComFunUtil.showDatePicker(context, (date) {
+          _endDayCtroller.text = date;
+        });
+      },
+      child: ComFunUtil().buideStandInput(context, '结束日', _endDayCtroller,
+          showPlaceholder: false,
+          valfun: (value) {
+            if (value.isEmpty) {
+              return '';
+            }
+          },
+          tapfun: true,
+          changfun: (_) {
+            setState(() {
+              _isplanreg = true;
+            });
+          }),
+    );
+  }
+
+  Future<String> showCardRegDialog() {
+    return showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => new AlertDialog(
+                    title: new Text("计划卡片激活注册"),
+                    contentPadding: EdgeInsets.all(10.0),
+                    content: Container(
+                      height: 30,
+                      child: Column(
+                        children: <Widget>[
+                          Text('激活码'),
+                          TextField(
+                            controller: _regCodeCtrl,
+                            cursorColor: GlobalConfig.mainColor,
+                            maxLength: 6,
+                            keyboardType: TextInputType.phone,
+                            decoration: new InputDecoration(
+                              hintText: '请输入激活码',
+                              contentPadding: EdgeInsets.all(10.0),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    actions: <Widget>[
+                      new FlatButton(
+                        child: new Text("取消"),
+                        onPressed: () {
+                          Navigator.of(context).pop('');
+                        },
+                      ),
+                      new FlatButton(
+                          child: _regclk == true ? Text('验证中…') : Text("确定"),
+                          onPressed: () {
+                            if (_regCodeCtrl.text != '') {
+                              Map<String, String> params = {
+                                "cardId": _curCardId,
+                                "orderNo": _orderNo,
+                                "smsSeq": _smsSeq,
+                                "phoneCode": _regCodeCtrl.text.trim()
+                              };
+                              setState(() {
+                                _regclk = true;
+                              });
+
+                              HttpUtils.apipost(
+                                  context, "Index/extcardAdd", params,
+                                  (response) {
+                                print(response);
+                                Navigator.of(context).pop(
+                                    "${response['error_code']},${response['message']}");
+                              });
+                            }
+                          })
+                    ])) ??
+        '';
+  }
 }

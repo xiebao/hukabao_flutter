@@ -22,23 +22,27 @@ class activeUserState extends State<activeUser> {
   TextEditingController _codeCtrl = TextEditingController();
 
 
-  void _handleSubmitted() {
+  void _handleSubmitted() async{
     final FormState form = _formKey1.currentState;
-    if (form.validate()) {
+    if (form.validate()){
       form.save();
       String codestr = _codeCtrl.text.trim();
       if (codestr == '') return;
+      String token = await HttpUtils().theToken;
+      if (token == '')
+        DialogUtils.close2Logout(context);
 
       List<String> coda = codestr.split(",");
       Map<String, String> params = {
         "cardno": coda[0], //10 位	卡号
         "code": coda[1], //32 位	激活码
+        "token":token
       };
       print(params);
-      HttpUtils.apipost(context, "Public/userActive", params, (response) {
+     await HttpUtils.apipost(context, "Public/userActive", params, (response) async {
         print(response);
-        DialogUtils.showToastDialog(context, text: response['message']);
-        if (response['error_code'] == 1) {
+        await DialogUtils.showToastDialog(context,response['message']);
+        if (response['error_code'] == '1') {
           Application.router.navigateTo(context, "/");
         }
       });
@@ -53,15 +57,15 @@ class activeUserState extends State<activeUser> {
       });
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
-        DialogUtils.showToastDialog(context, text:"请打开相机权限!");
+        await DialogUtils.showToastDialog(context,"请打开相机权限!");
       } else {
-        DialogUtils.showToastDialog(context, text: "位置错误: $e");
+        await DialogUtils.showToastDialog(context, "位置错误: $e");
       }
     } on FormatException{
-      DialogUtils.showToastDialog(context, text:"null (User returned using the  back -button before scanning anything. Result)");
+      await DialogUtils.showToastDialog(context,"null (User returned using the  back -button before scanning anything. Result)");
 
     } catch (e) {
-      DialogUtils.showToastDialog(context, text:e);
+      await DialogUtils.showToastDialog(context,e);
 
     }
   }

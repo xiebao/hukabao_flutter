@@ -57,7 +57,6 @@ class planLogPageState extends State<orderPlanLogPage> {
           Expanded(
               child: Container(
                 margin: EdgeInsets.only(top: 5.0),
-                height: 150.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -88,6 +87,7 @@ class planLogPageState extends State<orderPlanLogPage> {
                     Text(
                         '结果：${subject.status}'
                     ),
+                    const SizedBox(height: 5.0),
                   ],
                 ),
               )
@@ -134,7 +134,6 @@ class planLogPageState extends State<orderPlanLogPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('交易记录'),
-        leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: (){Application.run(context, "/");}),
       ),
       body: Center(
         child: _getBody(),

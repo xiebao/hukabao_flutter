@@ -16,9 +16,8 @@ class register extends StatefulWidget {
 
 class registerState extends State<register> {
   GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  final GlobalKey<FormFieldState<String>> _passwordFieldKey =
-      GlobalKey<FormFieldState<String>>();
-
+  TextEditingController _phoneNoCtrl = TextEditingController();
+  TextEditingController _PasswordCtrl = TextEditingController();
   String _phoneNo;
   String _password = '';
   String _inviteCode;
@@ -80,9 +79,13 @@ class registerState extends State<register> {
   }
 
   void _getsmsCode() async {
-    final form = _formKey.currentState;
-    if (form.validate()) {
-      form.save();
+    _phoneNo= _phoneNoCtrl.text.trim();
+    if(_phoneNo.isEmpty ||  !ComFunUtil.isChinaPhoneLegal(_phoneNo) ){
+      DialogUtils.showToastDialog(context,  '手机号必须填写');
+      return;
+    }
+
+
       Map<String, String> params = {
         "phone": _phoneNo,
         "type": '1',
@@ -90,16 +93,15 @@ class registerState extends State<register> {
 
       print("---Public/smsSend---");
       print(params);
-      HttpUtils.apipost(context, "Public/smsSend", params, (response) {
+      await HttpUtils.apipost(context, "Public/smsSend", params, (response) async{
         print(response);
-        DialogUtils.showToastDialog(context, text: response['message']);
-        if (response['error_code'] == 1) {
+         if (response['error_code'] == '1') {
           setState(() {
             _startTimer();
           });
         }
+        await DialogUtils.showToastDialog(context, response['message']);
       });
-    }
   }
 
   _startTimer() {
@@ -129,9 +131,9 @@ class registerState extends State<register> {
     super.initState();
   }
 
-  void _forSubmitted() {
+  void _forSubmitted() async{
     final form = _formKey.currentState;
-    if (form.validate() && _verifyCode != '') {
+    if (form.validate()) {
       form.save();
       Map<String, String> params = {
         "phone": _phoneNo,
@@ -140,10 +142,12 @@ class registerState extends State<register> {
         "code": _verifyCode
       };
       print(params);
-      HttpUtils.apipost(context, "Public/register", params, (response) {
-        DialogUtils.showToastDialog(context, text: response['message']);
+      await HttpUtils.apipost(context, "Public/register", params, (response) async{
+       await DialogUtils.showToastDialog(context, response['message']);
         print(response);
-        if (response['error_code'] == '1') Navigator.pop(context, "1");
+        String erd= response['error_code'].toString() ?? '0';
+        if ( erd== '1')
+           Application.run(context, "/login");
 //        关闭当前页面并返回添加成功通知
       });
     }
@@ -175,11 +179,15 @@ class registerState extends State<register> {
 
   Widget _buidPassword() {
     return TextFormField(
+      controller: _PasswordCtrl,
       obscureText: _obscureText,
       validator: (String value) {
-        if (value.isEmpty || value.trim().length <= 6) {
+        if (value.isEmpty || value.trim().length < 6) {
           return '密码过短';
         }
+        setState(() {
+          _password = value;
+        });
       },
       onFieldSubmitted: (String value) {
         setState(() {
@@ -194,13 +202,11 @@ class registerState extends State<register> {
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
         filled: true,
-        hintText: "请输入密码",
-        helperText: "请输入至少6位密码",
+        hintText: "请输入至少6位密码",
         icon: Icon(Icons.lock) ,
         fillColor: Colors.white,
         errorStyle: TextStyle(fontSize: 8),
         suffixIcon: GestureDetector(
-//          dragStartBehavior: DragStartBehavior.down,
           onTap: () {
             setState(() {
               _obscureText = !_obscureText;
@@ -221,22 +227,20 @@ class registerState extends State<register> {
       obscureText: true,
       decoration: const InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
-        hintText: "密码确认",
-        helperText: "请再一次输入密码",
+        hintText: "请再输入一次密码",
         icon: Icon(Icons.lock) ,
         filled: true,
         fillColor: Colors.white,
         errorStyle: TextStyle(fontSize: 8),
       ),
-
-//      validator: (String value) {return _validatePassword(value);},
       validator: (String value) {
         _passwordre = false;
-        if (_password == '') return "";
+        _password=_PasswordCtrl.text.trim();
+        if (_password == '') return "请先输入密码";
         if (_password != value)
-          return "";
-        else
-          _passwordre = true;
+          return "密码不一致";
+
+        _passwordre = true;
       },
     );
   }
@@ -263,6 +267,7 @@ class registerState extends State<register> {
   Widget _buildPhoneText() {
     var node = new FocusNode();
     return TextFormField(
+      controller: _phoneNoCtrl,
 //      autovalidate: true,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -284,7 +289,7 @@ class registerState extends State<register> {
       ],
       validator: (String value) {
         if (value.isEmpty) {
-          return '';
+          return '请填写手机号码';
         } else {
           if (!ComFunUtil.isChinaPhoneLegal(value.trim())) return '号码有误';
         }

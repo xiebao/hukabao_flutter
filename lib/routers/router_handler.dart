@@ -10,6 +10,7 @@ import '../views/sharePage.dart';
 import '../views/payLog.dart';
 import '../views/orderList.dart';
 import '../views/plan_page.dart';
+import '../views/myMsgList.dart';
 
 
 // /web?url=${Uri.encodeComponent(linkUrl)}&title=${Uri.encodeComponent('掘金沸点')}
@@ -76,6 +77,13 @@ Handler orderListPageHandler = Handler(
     handlerFunc: (BuildContext context, Map<String, List<String>> params) {
       return orderListPage();
     });
+
+
+Handler myMsgListPageHandler = Handler(
+    handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+      return myMsgListPage();
+    });
+
 
 
 /*

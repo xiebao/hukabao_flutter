@@ -24,6 +24,8 @@ class BookCell {
   String dfault; //
   String planBanged; //
   String planChannel; //
+  String singleQuota; //
+  String dayQuota; //
 
   BookCell(
       {this.id,
@@ -41,6 +43,8 @@ class BookCell {
       this.bankRepayDate,
       this.planBanged,
       this.planChannel,
+        this.singleQuota,
+        this.dayQuota,
       this.dfault});
 
   factory BookCell.fromJson(Map<String, dynamic> json) {
@@ -55,11 +59,13 @@ class BookCell {
         phoneNo: json['phoneNo']??'',
         bankCode: json['bankCode']??'',
         bankAbbr: json['bankAbbr']??'',
-        cardIcon: json['bankAbbr'].toString().toLowerCase() ?? 'unionpay',
+        cardIcon: json['bankAbbr'].toString().toLowerCase() ?? '',
         planBanged: json['payNoBangd'].toString()??"1",
         planChannel: json['channel'].toString()??"1",
         bankBill: json['bankBill']??'',
         bankRepayDate: json['bankRepayDate']??'',
+        dayQuota: json['day_quota'].toString()??"未知",
+        singleQuota: json['single_quota'].toString()??"未知",
         dfault: json['default']??'0');
   }
 

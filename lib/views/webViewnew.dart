@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import '../utils/DialogUtils.dart';
 import '../components/loading_gif.dart';
 import '../globleConfig.dart';
 
@@ -57,9 +58,10 @@ class _ArticleDetailState extends State<WebView> {
             withJavascript: true,
             initialChild: Container(
               color: Colors.white,
-              child: const Center(
+              child: Center(
 //                child: Text('Waiting.....'),
-                child: Loading(color: Color(0xFFC9A063), size: 56.0),
+//                child: Loading(color: Color(0xFFC9A063), size: 56.0),
+              child: DialogUtils.uircularProgress(),
               ),
             ),
           ),

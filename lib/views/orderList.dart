@@ -20,7 +20,7 @@ class orderListPageState extends State<orderListPage> {
     }
     loading = true;
     try {
-    HttpUtils.apipost(context, 'Order/orderList/p/'+_page.toString(), {}, (response) {
+    await HttpUtils.apipost(context, 'Order/orderList/p/'+_page.toString(), {}, (response) {
       setState(() {
         print(response);
         _page += 1;
@@ -44,15 +44,22 @@ class orderListPageState extends State<orderListPage> {
     }
   }
 
-  _getItem(OrderCell subject) {
+  _getItem(OrderCell subject)  {
     var row = InkWell(
-      onTap:(){
-        Navigator.push(
+      onTap:()async{
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) =>  orderDetail(subject),
           ),
-        );} ,
+        ).then((result) {
+          if (result == '1') {
+            setState(() {
+              subject.status='已取消';
+            });
+          }
+        });
+        } ,
       child: Container(
         margin: EdgeInsets.all(4.0),
         child: Row(
@@ -60,7 +67,6 @@ class orderListPageState extends State<orderListPage> {
             Expanded(
                 child: Container(
                   margin: EdgeInsets.only(left: 8.0),
-                  height: 150.0,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
@@ -90,6 +96,7 @@ class orderListPageState extends State<orderListPage> {
                       Text(
                           '创建时间：${subject.create_time}'
                       ),
+                      const SizedBox(height: 5.0),
                     ],
                   ),
                 )

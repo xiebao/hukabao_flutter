@@ -47,6 +47,7 @@ class homePageState extends State<homePage>
   void _initPicList() async {
     await HttpUtils.apipost(context,'Index/cardIndex',{},(response) {
       print("----------------adList--------------------");
+
       PicsCell dd;
       print(response['data']['adList']);
       setState(() {
@@ -222,8 +223,8 @@ class homePageState extends State<homePage>
 
   @override
   void initState() {
-    super.initState();
     _initPicList();
+    super.initState();
     _controller = new AnimationController( vsync: this, duration: const Duration(seconds: 3));
   }
 

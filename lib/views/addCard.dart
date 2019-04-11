@@ -38,6 +38,7 @@ class addCardState extends State<addCard> {
   String _smsSeq;
 
   int _seconds = 0;
+  bool _getsmscode=false;
   String _verifyStr = '获取验证码';
   String _verifyCode;
   Timer _timer;
@@ -95,8 +96,8 @@ class addCardState extends State<addCard> {
                             _buildBankIdText(),
                      const SizedBox(height: 2.0),
                             _buildRegionText(),
-                     const SizedBox(height: 2.0),
-                            _buildBranchText(),
+//                     const SizedBox(height: 2.0),
+//                            _buildBranchText(),
                      const SizedBox(height: 2.0),
                             _buildPhoneText(),
                      const SizedBox(height: 2.0),
@@ -115,19 +116,13 @@ class addCardState extends State<addCard> {
                             _buildBankIdText(),
                      const SizedBox(height: 2.0),
                             _buildRegionText(),
-                     const SizedBox(height: 2.0),
-                            _buildBranchText(),
+                   /*  const SizedBox(height: 2.0),
+                            _buildBranchText(),*/
 
                      const SizedBox(height: 2.0),
                      _buidbilendText(),
-                   /*         _buildBankBillText(),
-                     const SizedBox(height: 2.0),
-                            _buildEnddayText(),*/
                      const SizedBox(height: 2.0),
                      _buidExdymmyyRow(),
-                  /*   _buildCardCvn2Text(),
-                     const SizedBox(height: 2.0),
-                     _buildCardExpiredText(),*/
                      const SizedBox(height: 2.0),
                             _buildPhoneText(),
                      const SizedBox(height: 2.0),
@@ -164,67 +159,79 @@ class addCardState extends State<addCard> {
   }
 
   _checkvalue()
-  {
+  async{
      _name= _nameCtrl.text.trim();
-      if(_name.isEmpty )
-        return  DialogUtils.showToastDialog(context, text: '姓名输入错误');
+      if(_name.isEmpty ){
+        await DialogUtils.showToastDialog(context,'姓名输入错误');
+        return false;
+      }
+
 
      _phoneNo= _phoneNoCtrl.text.trim();
-     if(_phoneNo.isEmpty ||  !ComFunUtil.isChinaPhoneLegal(_name) )
-       return  DialogUtils.showToastDialog(context, text: '预留手机号必须填写');
+     if(_phoneNo.isEmpty ||  !ComFunUtil.isChinaPhoneLegal(_phoneNo) ){
+       await DialogUtils.showToastDialog(context,'预留手机号必须填写');
+       return false;
+     }
 
      _idCard= _idCardCtrl.text.trim();
-    if(_idCard.isEmpty ||_idCard.length<16 || _idCard.trim().length > 18)
-      return  DialogUtils.showToastDialog(context, text: '身份证号码输入错误');
+    if(_idCard.isEmpty ||_idCard.length<16 || _idCard.trim().length > 18){
+      await DialogUtils.showToastDialog(context,'身份证号码输入错误');
+      return false;
+    }
 
     _cardNo= _cardNoCtrl.text.trim();
-    if(_cardNo.isEmpty || _cardNo.length<10)
-      return  DialogUtils.showToastDialog(context, text: '卡号输入错误');
-
-     _branch= _branchCtrl.text.trim();
-    if(_branch.isEmpty && _cardType=='1'  )
-      return  DialogUtils.showToastDialog(context, text: '分行必须填写');
+    if(_cardNo.isEmpty || _cardNo.length<10){
+      await DialogUtils.showToastDialog(context,'卡号输入错误');
+      return false;
+    }
 
 
-    if(_bankIdCtrl.text.isEmpty )
-      return  DialogUtils.showToastDialog(context, text: '请选择卡片银行');
+    if(_bankIdCtrl.text.isEmpty){
+      await DialogUtils.showToastDialog(context,'请选择卡片银行');
+      return false;
+    }
 
-    if(_regionCtrl.text.isEmpty )
-      return  DialogUtils.showToastDialog(context, text: '请选择所属地区');
+    if(_regionCtrl.text.isEmpty ){
+      await DialogUtils.showToastDialog(context,'请选择所属地区');
+      return false;
+    }
 
-
-    _cardExpired= _cardExpiredCtrl.text;
-    if(_cardExpired.isEmpty  && _cardType=='2')
-      return  DialogUtils.showToastDialog(context, text: '请选择卡片有效期');
+     _cardExpired= _cardExpiredCtrl.text;
+    if(_cardExpired.isEmpty  && _cardType=='2'){
+      await DialogUtils.showToastDialog(context,'请选择卡片有效期');
+      return false;
+    }
 
     _bankBill=_bankBillCtrl.text;
-    if(_bankBill.isEmpty  && _cardType=='2')
-      return  DialogUtils.showToastDialog(context, text: '请选择账单日');
+    if(_bankBill.isEmpty  && _cardType=='2'){
+      await DialogUtils.showToastDialog(context,'请选择账单日');
+      return false;
+    }
 
     _bankRepayDate=_bankRepayDateCtrl.text;
     if(_bankRepayDate.isEmpty && _cardType=='2' )
-      return  DialogUtils.showToastDialog(context, text: '请选择还款日');
+      await DialogUtils.showToastDialog(context,'请选择还款日');
 
      _cardCvn2= _cardCvn2Ctrl.text;
-     if(_cardCvn2.isEmpty && _cardType=='2' )
-       return  DialogUtils.showToastDialog(context, text: '卡片背面3位校验码必须填写');
+     if(_cardCvn2.isEmpty && _cardType=='2' ){
+       await DialogUtils.showToastDialog(context,'卡片背面3位校验码必须填写');
+       return false;
+     }
 
+     final form = _formKey.currentState;
+     if(form.validate())
+       {
+         form.save();
+       }
 
-
-     setState(() {
-       final form = _formKey.currentState;
-       if(form.validate())
-         {
-           form.save();
-           return true;
-         }
-      });
+       return true;
   }
 
   void _getsmsCode() async {
-    print("-=-=-=-=--=");
+    print("----_getsmsCode0---");
     _cardType = widget.cardType;
     if (_checkvalue()==true) {
+      _getsmscode=true;
       Map<String, String> params = {
         "cardType": _cardType,
         "name": _name,
@@ -232,7 +239,7 @@ class addCardState extends State<addCard> {
         "cardNo": _cardNo,
         "bankId": _bankId,
         "regionCode": _regionCode,
-        "branch": _branch,
+        "branch": _region,
         "phoneNo": _phoneNo,
         "cardCvn2": _cardCvn2,
         "cardExpired": _cardExpired,
@@ -240,31 +247,33 @@ class addCardState extends State<addCard> {
         "bankRepayDate": _bankRepayDate
       };
 
-      print("----_getsmsCode---");
+      print("----_getsmsCode1---");
       print(params);
       try {
         showLoadingDialog();
-        HttpUtils.apipost(context, "Index/cardAddFirst", params, (response) {
+        await HttpUtils.apipost(context, "Index/cardAddFirst", params, (response) async{
           print(response);
-
-          DialogUtils.showToastDialog(context, text: response['message']);
-          if (response['error_code'] == 1) {
+          if (response['error_code'] == '1') {
             _orderNo = response['data']['orderNo'];
             _smsSeq = response['data']['smsSeq'];
             setState(() {
               _startTimer();
             });
           }
+          await DialogUtils.showToastDialog(context, response['message']);
+
         });
+        hideLoadingDialog();
       } catch (e) {
         print(e);
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx and is also not 304.
-        DialogUtils.showToastDialog(context, text: '网络连接错误');
-      } finally {
-        hideLoadingDialog();
+       await DialogUtils.showToastDialog(context, '网络连接错误');
       }
     }
+    else
+      _getsmscode=false;
+
   }
 
   _startTimer() {
@@ -301,9 +310,9 @@ class addCardState extends State<addCard> {
 
   void _initBanklist() async {
     await HttpUtils.apipost(
-        context, "Index/cardSelect", {'cardType': widget.cardType}, (response) {
+        context, "Index/cardSelect", {'cardType': widget.cardType}, (response) async{
       print(response);
-      if (response['error_code'] == 1) {
+      if (response['error_code'] == '1') {
         response['data']['bankList'].forEach((ele) {
           if (ele.isNotEmpty) {
             print(ele);
@@ -312,15 +321,14 @@ class addCardState extends State<addCard> {
           }
         });
       } else
-        DialogUtils.showToastDialog(context, text: response['message']);
+       await DialogUtils.showToastDialog(context, response['message']);
     });
   }
 
-  void _forSubmitted() {
-
+  void _forSubmitted() async{
     _cardType = widget.cardType;
     if( _smsSeq.isEmpty ||  _orderNo.isEmpty){
-      DialogUtils.showToastDialog(context, text: "请先获取验证码");
+      await DialogUtils.showToastDialog(context,  "请先获取验证码");
       return;
     }
 
@@ -333,7 +341,7 @@ class addCardState extends State<addCard> {
         "cardNo": _cardNo,
         "bankId": _bankId,
         "regionCode": _regionCode,
-        "branch": _branch,
+        "branch": _region,
         "phoneNo": _phoneNo,
         "cardCvn2": _cardCvn2,
         "cardExpired": _cardExpired,
@@ -346,24 +354,24 @@ class addCardState extends State<addCard> {
       try {
         showLoadingDialog();
 
-        HttpUtils.apipost(context, "Index/cardAdd", params, (response) {
-          DialogUtils.showToastDialog(context, text: response['message']);
-          print(response);
+       await HttpUtils.apipost(context, "Index/cardAdd", params, (response) async{
           hideLoadingDialog();
-          if (response['error_code'] == '1') Navigator.pop(context, "1");
+         await DialogUtils.showToastDialog(context, response['message']);
+          print(response);
+          if (response['error_code'] == '1')
+            Navigator.of(context).pop("1");
+//            Navigator.pop(context, "1");
 //        关闭当前页面并返回添加成功通知
         });
       } catch (e) {
         print(e);
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx and is also not 304.
-        DialogUtils.showToastDialog(context, text: '网络连接错误');
-      } finally {
-        hideLoadingDialog();
+       await DialogUtils.showToastDialog(context, '网络连接错误');
       }
-//      showDialog(context: context, builder: (ctx)=> new AlertDialog(
-//        content:  new Text('$_name $_color $_config'),
-//      ));
+
+      hideLoadingDialog();
+
     }
   }
 
@@ -480,14 +488,17 @@ class addCardState extends State<addCard> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Expanded(
+            flex:5,
             child:_buildBankBillText(),
           ),
           Expanded(
+            flex:1,
             child: new SizedBox(
               width: 10.0,
             ),
           ),
            Expanded(
+             flex:5,
             child: _buildEnddayText(),
           ),
         ],
@@ -504,7 +515,7 @@ class addCardState extends State<addCard> {
 //        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Expanded(
-            flex:6,
+            flex:5,
             child:_buildCardCvn2Text(),
           ),
           Expanded(
@@ -567,9 +578,11 @@ class addCardState extends State<addCard> {
   Widget _buildVerifyCodeEdit() {
 
     Widget verifyCodeEdit =
-     ComFunUtil().buideStandInput(context, '短信验证码',_verifyCodeCtrl,iType: 'number',maxlen: 6,txtalign: TextAlign.start,txtdrt: TextDirection.ltr,
+     ComFunUtil().buideStandInput(context, '短信验证码',_verifyCodeCtrl,iType: 'number',maxlen: 6,
+       enable: _getsmscode,
+       txtalign: TextAlign.start,txtdrt: TextDirection.ltr,
       valfun:(value){
-        if (value.isEmpty ) {
+        if (value.isEmpty() ) {
           return '';
         }},
       svefun: (value){
@@ -582,7 +595,7 @@ class addCardState extends State<addCard> {
       child: new Container(
         alignment: Alignment.center,
         width: 70.0,
-        height: 20.0,
+        height: 30.0,
         decoration: new BoxDecoration(
           border: new Border.all(
             width: 1.0,
@@ -597,7 +610,7 @@ class addCardState extends State<addCard> {
     );
 
     return new Padding(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(2),
       child: new Stack(
         children: <Widget>[
           verifyCodeEdit,

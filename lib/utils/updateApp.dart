@@ -112,8 +112,20 @@ class UpdateApp {
     try {
 //      Dio dio = new Dio();
       Dio dio = createInstance();
+      String url= GlobalConfig.base + 'Public/apkUpdate';
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        url= GlobalConfig.base + 'Public/apkUpdate';
+      }
+      else if (defaultTargetPlatform == Platform.isIOS) {
+        url= GlobalConfig.base + 'Public/iosUpdate';
+      }
+      else
+      {
+             return false;
+      }
+
       await dio
-          .get(GlobalConfig.base + 'Public/apkUpdate')
+          .get(url)
           .then((Response response) async {
         print(response);
         statusCode = response.statusCode;
@@ -223,8 +235,8 @@ class UpdateApp {
           savePath="$path/hukabao.ipa";
     }
 
-    downresponse = await dio.download(url,savePath,onReceiveProgress: (received, total) async {
-      await _downloading(context, received, total);
+    downresponse = await dio.download(url,savePath,onReceiveProgress: (received, total) {
+       _downloading(context, received, total);
     });
       /*
 //      分块续传
@@ -241,11 +253,11 @@ class UpdateApp {
 
   }
 
-  void _downloading(context, int received, int total) async{
+  void _downloading(context, int received, int total) {
     if (total != -1) {
       print("正在下载……");
       print((received / total * 100).toStringAsFixed(0) + "%");
-      await DialogUtils.showProgressIndicator(context, received / total);
+
     }
   }
 

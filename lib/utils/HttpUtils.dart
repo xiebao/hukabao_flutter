@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity/connectivity.dart';
 import '../globleConfig.dart';
 import '../utils/DialogUtils.dart';
-import '../routers/application.dart';
+import '../model/globle_model.dart';
 
 class HttpUtils {
   /// global dio object
@@ -69,20 +69,12 @@ class HttpUtils {
     dio = null;
   }
 
-  // 获取安装地址
   Future<String> get theToken async {
     final SharedPreferences prefs = await _prefs;
     var token = prefs.getString('token') ?? '';
     return token;
   }
 
-  /*
-  Future<String> getToken() async {
-    final SharedPreferences prefs  = await _prefs;
-    var token = prefs.getString('token') ?? '';
-    return token;
-  }
-*/
   //get请求
   void get(String url, Function callBack,
       {Map<String, dynamic> params, Function errorCallBack}) async {
@@ -141,7 +133,7 @@ class HttpUtils {
       Function errorCallBack,
       BuildContext context,
       bool withToken = true}) async {
-    print("<net---> url :<" + method + ">" + url);
+    print("-----<net---> url :<" + method + ">" + url);
     if (params != null && params.isNotEmpty) {
       print("<net> params :" + params.toString());
     }
@@ -158,10 +150,13 @@ class HttpUtils {
 
     dio = createInstance();
     if (withToken == true) {
-      String token = await HttpUtils().theToken;
+      final model =globleModel().of(context);
+      String token= model.token;
+
       dio.options.headers = {
         'access-token': token,
       };
+      print(" ===access-token: $token ===");
     }
 
     if (method == GET) {
@@ -179,7 +174,6 @@ class HttpUtils {
     if (params == null || params.isEmpty) {
       params = {};
     }
-    print("- dio--request-ing---");
 
     try {
       Response response = await dio.request(GlobalConfig.base + url,
@@ -187,15 +181,20 @@ class HttpUtils {
 
       int statusCode = response.statusCode;
 
-      print("======dio request========$statusCode ==================");
       if (statusCode < 0 && errorCallBack != null) {
         errorMsg = "网络请求错误,状态码:" + statusCode.toString();
         _handError(context,errorMsg);
       }
+      String ercd=response.data['error_code'].toString()??'0';
+      response.data["error_code"]=ercd;
 
-      if (response.data["error_code"].toString() == '-2') {
-        print('error_code==-2,重新登录2------');
+      print("----return--error_code:-----${response.data['error_code']}--------");
+
+      if (ercd== '-2') {
+        print(response.data);
+        print('error_code==-2,重新登录111------');
         await  DialogUtils.close2Logout(context);
+        return;
       }
 
       if (callBack != null) {
@@ -212,10 +211,10 @@ class HttpUtils {
 
   //处理异常
   static void _handError(BuildContext context,String errorMsg,
-      { Function errorCallback}) {
+      { Function errorCallback}) async{
     print("<net> errorMsg :" + errorMsg);
     if (errorCallback != null) {
-      DialogUtils.showToastDialog(context,text:errorMsg);
+     await DialogUtils.showToastDialog(context,errorMsg);
     }
       else
         errorCallback(errorMsg);
@@ -249,13 +248,15 @@ class HttpUtils {
       if (response.data["error_code"].toString() == '-2') {
         print('error_code==-2,重新登录2------');
         await  DialogUtils.close2Logout(context);
+        return;
+      }else{
+        if (callBack != null) {
+          callBack(response.data);
+        } else {
+         await DialogUtils.showToastDialog(context,'请求成功');
+        }
       }
 
-      if (callBack != null) {
-        callBack(response.data);
-      } else {
-        DialogUtils.showToastDialog('请求成功');
-      }
     } catch (e) {
       print('dddddddddddd');
     }

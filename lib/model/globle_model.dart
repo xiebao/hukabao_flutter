@@ -20,20 +20,20 @@ class globleModel extends Model {
   Future setlogin(token, Map<String, dynamic> userinfo) async {
     print('+++++++++++++++setlogin+++++++++++++++');
     SharedPreferences sp = await _prefs;
-    sp.setString("token", token);
+    await sp.setString("token", token);
 
     _token = token;
     _loginStatus = true;
     _userinfo = Userinfo.fromJson(userinfo);
-    print(_userinfo.phone);
+    print(_userinfo.phone+"====="+_token);
     // 通知所有的 listener
     notifyListeners();
   }
 
   Future setlogout() async {
     SharedPreferences prefs = await _prefs;
-    prefs.remove('token');
-    prefs.clear(); //清空键值对
+   await prefs.remove('token');
+   await prefs.clear(); //清空键值对-有其他参数保留
     _token = null;
     _loginStatus = false;
     _userinfo = null;

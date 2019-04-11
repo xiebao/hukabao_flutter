@@ -13,14 +13,10 @@ class fogetpwdPage extends StatefulWidget {
 
 class fogetpwdPageState extends State<fogetpwdPage> {
   GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  final GlobalKey<FormFieldState<String>> _passwordFieldKey =
-      GlobalKey<FormFieldState<String>>();
+  TextEditingController _phoneNoCtrl = TextEditingController();
 
   String _phoneNo;
   String _password = '';
-  String _inviteCode;
-  bool _termsChecked = true;
-
   bool _obscureText = true;
 
   int _seconds = 0;
@@ -70,26 +66,30 @@ class fogetpwdPageState extends State<fogetpwdPage> {
   }
 
   void _getsmsCode() async {
-    final form = _formKey.currentState;
-    if (form.validate()) {
-      form.save();
-      Map<String, String> params = {
+    _phoneNo= _phoneNoCtrl.text.trim();
+    if(_phoneNo.isEmpty ||  !ComFunUtil.isChinaPhoneLegal(_phoneNo) ) {
+      await DialogUtils.showToastDialog(context, '手机号必须填写');
+      return;
+    }
+
+    Map<String, String> params = {
         "phone": _phoneNo,
         "type": '2',
       };
 
       print("---Public/smsSend---");
       print(params);
-      HttpUtils.apipost(context, "Public/smsSend", params, (response) {
+     await HttpUtils.apipost(context, "Public/smsSend", params, (response) async{
         print(response);
-        DialogUtils.showToastDialog(context, text: response['message']);
-        if (response['error_code'] == 1) {
+        if (response['error_code'] == '1') {
           setState(() {
             _startTimer();
           });
         }
-      });
-    }
+        await DialogUtils.showToastDialog(context, response['message']);
+
+     });
+
   }
 
   _startTimer() {
@@ -129,9 +129,9 @@ class fogetpwdPageState extends State<fogetpwdPage> {
         "code": _verifyCode
       };
       print(params);
-      HttpUtils.apipost(context, "Public/resetPasswrod", params, (response) {
-        DialogUtils.showToastDialog(context, text: response['message']);
+      HttpUtils.apipost(context, "Public/resetPasswrod", params, (response) async{
         print(response);
+        await  DialogUtils.showToastDialog(context, response['message']);
         if (response['error_code'] == '1') Navigator.pop(context, "1");
 //        关闭当前页面并返回添加成功通知
       });
@@ -183,6 +183,7 @@ class fogetpwdPageState extends State<fogetpwdPage> {
   Widget _buildPhoneText() {
     var node = new FocusNode();
     return TextFormField(
+      controller: _phoneNoCtrl,
 //      autovalidate: true,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 12.0),

@@ -15,7 +15,7 @@ class planReviewPage extends StatefulWidget {
 
 class planReviewPageState extends State<planReviewPage> {
   bool loading = false;
-
+bool _setok=false;
   _getItem(PlanViewCell subject) {
     var row = Container(
       margin: EdgeInsets.all(4.0),
@@ -24,7 +24,6 @@ class planReviewPageState extends State<planReviewPage> {
           Expanded(
               child: Container(
             margin: EdgeInsets.only(left: 8.0),
-            height: 150.0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -47,6 +46,7 @@ class planReviewPageState extends State<planReviewPage> {
 //
                 Text('计划时间：${subject.planTime}'),
                 Text('手续费：${subject.planFee}'),
+                const SizedBox(height: 5.0),
               ],
             ),
           ))
@@ -59,15 +59,23 @@ class planReviewPageState extends State<planReviewPage> {
   }
 
   _planConfirm() async {
-    HttpUtils.apipost(
-        context, 'Order/planConfirm', {'planId': widget.info.planID},
-        (response) {
-      print('=================planConfirm======================');
-      DialogUtils.showToastDialog(context, text: response['message']);
-      if (response['error_code'] != "-1") {
-        Application.run(context, "/");
-      }
+    setState(() {
+      _setok=true;
     });
+    await HttpUtils.apipost(
+        context, 'Order/planConfirm', {'planId': widget.info.planID},
+        (response) async{
+      print('=================planConfirm======================');
+      String erd= response['error_code'].toString() ?? '0';
+      if ( erd== '1')
+        {
+          setState(() {
+            _setok=true;
+          });
+        }
+      await DialogUtils.showToastDialog(context, response['message']);
+    });
+//    Navigator.of(context).pop();
   }
 
   @override
@@ -80,22 +88,17 @@ class planReviewPageState extends State<planReviewPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text('计划预览'),
-          leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                Application.run(context, "/");
-              }),
           bottom: PreferredSize(
               child: Container(
-                  height: 40,
+                  height: 60,
                   width: double.infinity,
                   color: Colors.grey,
-                  child: Text("  当前${widget.info.cardNo}  计划:${widget.info.planinfo}",
+                  child: Text("  [卡片：${widget.info.cardNo}] 当前计划:${widget.info.planinfo}",
 //                textAlign: TextAlign.center,
                 style: new TextStyle(color: Colors.white, fontSize: 12.0),
-                    maxLines: 2,
+                    maxLines: 3,
               )),
-              preferredSize: Size(200, 45)),
+              preferredSize: Size(200, 55)),
           /* actions: <Widget>[
            InkWell(onTap: (){Application.run(context, "/");} ,child: Text("取消"),),
           IconButton(
@@ -123,7 +126,7 @@ class planReviewPageState extends State<planReviewPage> {
             },
           ),
         ),
-        floatingActionButton: FloatingActionButton.extended(
+        floatingActionButton:_setok==true ?null: FloatingActionButton.extended(
           icon: Icon(Icons.done),
           label: Text("确认计划"),
           onPressed: _planConfirm,

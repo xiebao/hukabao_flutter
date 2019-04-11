@@ -9,28 +9,34 @@ class Application {
       {String url, String title, bool withToken = true}) async {
     if (appuri.startsWith('/web')) {
       if (url != '') {
-        await HttpUtils().theToken.then((String token) async {
-          if (token == '')
-            DialogUtils.close2Logout(context);
-          else {
-            if (withToken == true)
+        if (withToken == true) {
+           String token= await HttpUtils().theToken;
+            if (token == '')
+              DialogUtils.close2Logout(context);
+            else {
               url = url.endsWith('token/')
                   ? url + token
                   : "$url/$token"; // "$url/token/$token";
-            appuri =
-                "/web?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title ?? '浏览')}";
+              appuri =
+                  "/web?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title ?? '浏览')}";
 
-            await HttpUtils.apipost(context,'Index/checktoken/token/$token',{},(response) {
-              if (response["error_code"].toString() == '1') {
-                router.navigateTo(context, appuri,
-                    transition: TransitionType.fadeIn);
-              } else
-                DialogUtils.close2Logout(context);
-            } );
-          }
-        });
+              await HttpUtils.apipost(
+                  context, 'Index/checktoken/token/$token', {}, (response) {
+                if (response["error_code"].toString() == '1') {
+                  router.navigateTo(context, appuri,
+                      transition: TransitionType.fadeIn);
+                } else
+                  DialogUtils.close2Logout(context);
+              });
+            }
+
+        } else {
+          appuri =
+              "/web?url=${Uri.encodeComponent(url)}&title=${Uri.encodeComponent(title ?? '浏览')}";
+          router.navigateTo(context, appuri, transition: TransitionType.fadeIn);
+        }
       } else {
-        DialogUtils.showToastDialog(context, text: '无效网址');
+       await DialogUtils.showToastDialog(context, '无效网址');
       }
     } else
       router.navigateTo(context, appuri, transition: TransitionType.native);

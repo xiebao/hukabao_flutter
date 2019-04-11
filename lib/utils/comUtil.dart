@@ -122,24 +122,27 @@ class ComFunUtil {
   }
 
   Widget buideStandInput(BuildContext context, String Labtext,TextEditingController textControllor,
-      {String iType,
+      {
         String osType='ios',
+        String iType,
       int maxlen,
       TextAlign txtalign,
       TextDirection txtdrt,
       bool enable=true,
       Function valfun,
       Function svefun,
-      bool tapfun = false
+      Function changfun,
+      bool tapfun = false,
+        bool showPlaceholder=false
       }) {
     Widget iosTextInput = CupertinoTextField(
       controller: textControllor ?? null,
       textAlign: txtalign ?? TextAlign.right,
-      prefix: Text(Labtext),
-      placeholder: "请输入$Labtext",
+      prefix: Text(Labtext,style: TextStyle(color: GlobalConfig.mainColor)),
+      placeholder: showPlaceholder?"请输入$Labtext":'',
       suffix: tapfun
           ? Icon(
-              Icons.settings_ethernet,
+              Icons.short_text,
               color: Colors.grey,
               size: 12,
             )
@@ -158,13 +161,13 @@ class ComFunUtil {
                 BorderSide(width: 0.0, color: CupertinoColors.inactiveGray)),
       ),
       onChanged: (str) {
-        return valfun(str) ?? null;
+        return changfun(str) ?? null;
       },
     );
 
     Widget adrformInput = TextFormField(
       controller: textControllor ?? null,
-      style: TextStyle(fontSize: 12),
+//      style: TextStyle(fontSize: 12),
       textAlign: txtalign ?? TextAlign.right,
       cursorColor: GlobalConfig.mainColor,
       maxLines: 1,
@@ -174,11 +177,11 @@ class ComFunUtil {
         iType == 'number' ? WhitelistingTextInputFormatter.digitsOnly : null,
       ],
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(vertical: 5.0),
+        contentPadding: const EdgeInsets.symmetric(vertical: 2.0),
 //        border: InputBorder.none,
 //  border: OutlineInputBorder(),
         hintText:  tapfun  ? "<…>"  : "请输入$Labtext",
-        hintStyle: TextStyle(fontSize: 10),
+        hintStyle: TextStyle(fontSize: 10,color: Colors.grey),
         filled: true,
         fillColor: Colors.white,
         errorStyle: TextStyle(fontSize: 8),

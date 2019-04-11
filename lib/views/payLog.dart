@@ -55,7 +55,6 @@ class payLogPageState extends State<payLogPage> {
           Expanded(
               child: Container(
                 margin: EdgeInsets.only(left: 8.0),
-                height: 150.0,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -89,6 +88,7 @@ class payLogPageState extends State<payLogPage> {
                     Text(
                         '结果：${subject.status}'
                     ),
+                    const SizedBox(height: 5.0),
                   ],
                 ),
               )
