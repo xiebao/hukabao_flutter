@@ -158,8 +158,7 @@ class addCardState extends State<addCard> {
     });
   }
 
-  _checkvalue()
-  async{
+ Future<bool> _checkvalue()  async{
      _name= _nameCtrl.text.trim();
       if(_name.isEmpty ){
         await DialogUtils.showToastDialog(context,'姓名输入错误');
@@ -222,15 +221,17 @@ class addCardState extends State<addCard> {
      if(form.validate())
        {
          form.save();
+         return true;
        }
 
-       return true;
+     return false;
   }
 
   void _getsmsCode() async {
     print("----_getsmsCode0---");
     _cardType = widget.cardType;
-    if (_checkvalue()==true) {
+    if (await _checkvalue()) {
+      print("----_getsmsCode0111---");
       _getsmscode=true;
       Map<String, String> params = {
         "cardType": _cardType,
@@ -266,8 +267,6 @@ class addCardState extends State<addCard> {
         hideLoadingDialog();
       } catch (e) {
         print(e);
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx and is also not 304.
        await DialogUtils.showToastDialog(context, '网络连接错误');
       }
     }

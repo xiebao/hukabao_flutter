@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../utils/HttpUtils.dart';
 import '../utils/DialogUtils.dart';
 import '../routers/application.dart';
-import 'package:barcode_scan/barcode_scan.dart';
+//import 'package:barcode_scan/barcode_scan.dart';
 import '../model/globle_model.dart';
 
 class activeUser extends StatefulWidget {
@@ -49,7 +49,7 @@ class activeUserState extends State<activeUser> {
   }
 
   Future scan() async {
-    try {
+/*    try {
       String barcode = await BarcodeScanner.scan();
       setState(() {
          _codeCtrl.text = barcode;
@@ -66,7 +66,7 @@ class activeUserState extends State<activeUser> {
     } catch (e) {
       await DialogUtils.showToastDialog(context,e);
 
-    }
+    }*/
   }
 
 

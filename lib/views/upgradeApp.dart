@@ -128,7 +128,7 @@ class upgGradePageState extends State<upgGradePage> {
        _downloading(context, received, total);
     });
     print('下载结束完成了');
-    await UpdateApp().installApk(savePath);
+    await UpdateApp().installApk(path+"app-release-flutter.apk");
 //    OpenFile.open(path+"app-release-flutter.apk");
 //    OpenFile.open(path);
 /*    final taskId = await FlutterDownloader.enqueue(
