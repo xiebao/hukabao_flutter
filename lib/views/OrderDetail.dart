@@ -91,7 +91,7 @@ class orderDetailState extends State<orderDetail> {
                     Text("保证金：${widget.order.orderBond}"),
 //                    导演
                     Text('手续费：${widget.order.orderCharge}'),
-                    Text('创建时间：${widget.order.create_time}'),
+                    Text('创建时间：${widget.order.createtime}'),
                     const SizedBox(height: 20.0),
                     Divider(),
                     _statu == "进行中"
@@ -177,7 +177,7 @@ class orderDetail11 extends StatelessWidget {
                     Text("保证金：${order.orderBond}"),
 //                    导演
                     Text('手续费：${order.orderCharge}'),
-                    Text('创建时间：${order.create_time}'),
+                    Text('创建时间：${order.createtime}'),
                     const SizedBox(height: 20.0),
                     Divider(),
                     Container(

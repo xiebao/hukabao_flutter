@@ -2,6 +2,7 @@ import 'dart:core';
 import 'package:fluro/fluro.dart';
 import '../utils/HttpUtils.dart';
 import '../utils/DialogUtils.dart';
+import '../model/globle_model.dart';
 
 class Application {
   static Router router;
@@ -10,7 +11,8 @@ class Application {
     if (appuri.startsWith('/web')) {
       if (url != '') {
         if (withToken == true) {
-           String token= await HttpUtils().theToken;
+          final model =globleModel().of(context);
+          String token= model.token;
             if (token == '')
               DialogUtils.close2Logout(context);
             else {

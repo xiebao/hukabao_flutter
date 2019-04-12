@@ -5,6 +5,18 @@ import 'package:flutter_cupertino_date_picker/flutter_cupertino_date_picker.dart
 import '../globleConfig.dart';
 
 class ComFunUtil {
+  static String getImgPath(String name, {String format: 'png'}) {
+    return 'images/$name.$format';
+  }
+
+  static Color nameToColor(String name) {
+    // assert(name.length > 1);
+    final int hash = name.hashCode & 0xffff;
+    final double hue = (360.0 * hash / (1 << 15)) % 360.0;
+    return HSVColor.fromAHSV(1.0, hue, 0.4, 0.90).toColor();
+  }
+
+
   static bool isChinaPhoneLegal(String str) {
     return new RegExp(
             '^((13[0-9])|(15[^4])|(166)|(17[0-8])|(18[0-9])|(19[8-9])|(147,145))\\d{8}\$')
@@ -226,4 +238,5 @@ class ComFunUtil {
           )
         : osType=='ios'?iosTextInput:textInputRow;
   }
+
 }

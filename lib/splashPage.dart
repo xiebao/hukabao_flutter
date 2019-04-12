@@ -9,7 +9,6 @@ import './utils/DialogUtils.dart';
 import './utils/updateApp.dart';
 import './views/upgradeApp.dart';
 import 'package:package_info/package_info.dart';
-import 'package:path_provider/path_provider.dart';
 
 class SplashPage extends StatefulWidget {
   @override
@@ -20,20 +19,21 @@ class SplashState extends State<SplashPage> {
   Timer timer;
   bool _isupdate = false;
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
+  String _packageInfoversion,_packageInfobuildNumber;
   void getNowVersion() async {
     // 获取此时版本
-    var packageInfo = await PackageInfo.fromPlatform();
-    print(packageInfo.version); //1.0.0
-    print(packageInfo.packageName);
-    print(packageInfo.buildNumber); //1
-    print(packageInfo.appName);
-    print(UpdateApp().defaultTargetPlatform);
+   var packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _packageInfoversion=packageInfo.version;
+      _packageInfobuildNumber=packageInfo.buildNumber;
+    });
   }
 
   void _checkUpdateApp() async {
+    await getNowVersion();
     SharedPreferences prefs = await _prefs;
-    String isupdate =prefs.getString('update') ?? '';
+    String isupdate ='';//prefs.getString('update') ?? '';
+    print("_checkUpdateApp---"+isupdate);
     if (isupdate == '') {
       if (await UpdateApp().checkDownloadApp) {
         _isupdate = await DialogUtils().showMyDialog(context, '有更新版本，是否马上更新?');
@@ -53,20 +53,18 @@ class SplashState extends State<SplashPage> {
     if (prefs.getString('update') == 'no') {
       timer = Timer(const Duration(milliseconds: 1500), () async {
         String token = prefs.getString('token') ?? '';
+        print("--spalshpage--prefs--------$token---------------");
         if (token == '')
           Application.run(context, "/login");
         else {
           final model = globleModel().of(context);
-          print("------------${model.token}---------------");
+          await model.setToken(token);
           await HttpUtils.apipost(context, 'User/userInfo', {},
               (response) async {
             print(response);
             if (response["error_code"].toString() == '1') {
-              await model
-                  .setlogin(token, response["userinfo"])
-                  .whenComplete(() {
+              await model.setlogin(token, response["userinfo"]);
                 Application.run(context, "/home");
-              });
             } else
               Application.run(context, "/login");
           });
@@ -78,7 +76,6 @@ class SplashState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    getNowVersion();
     _checkUpdateApp();
   }
 
@@ -125,6 +122,10 @@ class SplashState extends State<SplashPage> {
                         fontWeight: FontWeight.bold),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Text("版本${_packageInfoversion}(${_packageInfobuildNumber})"),
+                )
               ],
             ),
           ),
@@ -132,7 +133,9 @@ class SplashState extends State<SplashPage> {
       ),
     );
   }
+/*
 
+import 'package:path_provider/path_provider.dart';
   Future<File> get _getLocalFile async {
     // get the path to the document directory.
     String dir = (await getTemporaryDirectory()).path;
@@ -157,7 +160,7 @@ class SplashState extends State<SplashPage> {
     }
 
     print(fil);
-    var dir_bool = await fil.exists(); //返回真假
-    print(dir_bool);
-  }
+    var dirbool = await fil.exists(); //返回真假
+    print(dirbool);
+  }*/
 }

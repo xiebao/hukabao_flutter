@@ -17,16 +17,22 @@ class globleModel extends Model {
 
   globleModel of(context) => ScopedModel.of(context);
 
-  Future setlogin(token, Map<String, dynamic> userinfo) async {
-    print('+++++++++++++++setlogin+++++++++++++++');
+  Future setlogin(String token, Map<String, dynamic> userinfo) async {
+    await setToken(token);
+    _userinfo = Userinfo.fromJson(userinfo);
+    print(_userinfo.phone+"=====");
+    // 通知所有的 listener
+    notifyListeners();
+  }
+
+  Future setToken(String token) async {
     SharedPreferences sp = await _prefs;
     await sp.setString("token", token);
-
+    print("++++++++setlogin:$token ++++");
+    print("===SharedPreferences getString :${sp.getString("token")}---");
     _token = token;
     _loginStatus = true;
-    _userinfo = Userinfo.fromJson(userinfo);
-    print(_userinfo.phone+"====="+_token);
-    // 通知所有的 listener
+
     notifyListeners();
   }
 

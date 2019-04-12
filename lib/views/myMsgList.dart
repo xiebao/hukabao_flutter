@@ -94,7 +94,7 @@ class myMsgListPagePageState extends State<myMsgListPage> {
                       ),//
 
                       Text(
-                          '时间：${subject.create_time}'
+                          '时间：${subject.createtime}'
                       ),
                       const SizedBox(height: 5.0),
                     ],

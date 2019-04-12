@@ -34,12 +34,12 @@ class UpdateApp {
   }
 
   // 获取安装地址
-  Future<String> get _apkLocalPath async {
+  Future<String> get apkLocalPath async {
     final directory = await getExternalStorageDirectory();
     return directory.path;
   }
 
-  TargetPlatform get defaultTargetPlatform {
+  static TargetPlatform get defaultTargetPlatform {
     TargetPlatform result;
     //这里根据平台来赋值，但是只有iOS、Android、Fuchsia，没有PC
     if (Platform.isIOS) {
@@ -93,7 +93,6 @@ class UpdateApp {
 //      DialogUtils.showToastDialog(context);
   }
 
-
   //具体的还是要看返回数据的基本结构
   Future<bool> get checkDownloadApp async {
     print("<net---> download :");
@@ -110,23 +109,17 @@ class UpdateApp {
     }
 
     try {
-//      Dio dio = new Dio();
       Dio dio = createInstance();
-      String url= GlobalConfig.base + 'Public/apkUpdate';
+      String url = GlobalConfig.base + 'Public/apkUpdate';
       if (defaultTargetPlatform == TargetPlatform.android) {
-        url= GlobalConfig.base + 'Public/apkUpdate';
-      }
-      else if (defaultTargetPlatform == Platform.isIOS) {
-        url= GlobalConfig.base + 'Public/iosUpdate';
-      }
-      else
-      {
-             return false;
+        url = GlobalConfig.base + 'Public/apkUpdate';
+      } else if (defaultTargetPlatform == Platform.isIOS) {
+        url = GlobalConfig.base + 'Public/iosUpdate';
+      } else {
+        return false;
       }
 
-      await dio
-          .get(url)
-          .then((Response response) async {
+      await dio.get(url).then((Response response) async {
         print(response);
         statusCode = response.statusCode;
         if (statusCode < 0) {
@@ -149,7 +142,7 @@ class UpdateApp {
           if (await SimplePermissions.checkPermission(
               Permission.WriteExternalStorage)) {
             if (newVersion.compareTo(packageInfo.version) > 0) {
-              isupdate= true;
+              isupdate = true;
             }
           } else {
             print('权限不容许');
@@ -162,11 +155,10 @@ class UpdateApp {
     return isupdate;
   }
 
- Future downloadApp(context) async {
+  Future checkdownloadApp(context) async {
     print("<net---> download :");
     String errorMsg = "";
     int statusCode;
-    bool isupdate = false;
     var connectivityResult = await (new Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
     } else if (connectivityResult == ConnectivityResult.wifi) {
@@ -205,8 +197,7 @@ class UpdateApp {
               Permission.WriteExternalStorage)) {
             if (newVersion.compareTo(packageInfo.version) > 0) {
               DialogUtils().showMyDialog(context, '有更新版本，是否马上更新?').then((rv) {
-                isupdate = rv;
-                return rv ? webdownload(context) : false;
+                return rv ? downloadApp(context) : false;
               });
             }
           } else {
@@ -220,25 +211,29 @@ class UpdateApp {
     }
   }
 
-  Future<bool> webdownload(context) async {
+  Future<bool> downloadApp(context) async {
     Dio dio = createInstance();
-    final path = await _apkLocalPath;
+    final path = await apkLocalPath;
     Response downresponse;
-    print('准备下载。');
+    print('准备下载……到：'+path);
+
     String url,savePath;
+    var nowTime = DateTime.now();
+    String fileround=nowTime.year.toString()+nowTime.day.toString()+nowTime.hour.toString()+nowTime.minute.toString()+nowTime.microsecond.toString();
     if (defaultTargetPlatform == TargetPlatform.android) {
       url= "https://down.hukabao.com/andriod/app-release-flutter.apk";
-      savePath="$path/hukabao.apk";
+      savePath="${path}/hukabao${fileround}.apk";
     } else if (defaultTargetPlatform == Platform.isIOS) {
       print('ios down!');
-          url=  "itms-services://?action=download-manifest&url=https:/down.hukabao.com/ios/hkb.plist'";
-          savePath="$path/hukabao.ipa";
+      url=  "itms-services://?action=download-manifest&url=https:/down.hukabao.com/ios/hkb.plist'";
+      savePath="$path/hukabao${fileround}.ipa";
     }
 
-    downresponse = await dio.download(url,savePath,onReceiveProgress: (received, total) {
-       _downloading(context, received, total);
+    downresponse =
+        await dio.download(url, savePath, onReceiveProgress: (received, total) {
+      _downloading(context, received, total);
     });
-      /*
+    /*
 //      分块续传
     await downloadWithChunks(url, savePath, onReceiveProgress: (received, total) {
       if (total != -1) {
@@ -248,37 +243,35 @@ class UpdateApp {
     });*/
 
     print('下载结束完成了');
-    Navigator.of(context).pop();
-    await _installApk();
-
+    await installApk(savePath);
+    return true;
   }
 
   void _downloading(context, int received, int total) {
     if (total != -1) {
       print("正在下载……");
       print((received / total * 100).toStringAsFixed(0) + "%");
-
     }
   }
 
   // 安装
-  Future<Null> _installApk() async {
+  Future<Null> installApk(String file) async {
     const platform = const MethodChannel('com.hukabao.flutter.xiebaoxin');
 //    final path = await _apkLocalPath;
-    await _apkLocalPath.then((path) async {
+    await apkLocalPath.then((path) async {
       try {
         print('正在准备安装……');
-        await SystemChannels.platform
-            .invokeMethod('SystemNavigator.pop'); //关闭App
+
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop'); //关闭App
+
         if (defaultTargetPlatform == TargetPlatform.android) {
-          // 可以安装了
           await platform
-              .invokeMethod('install', {'path': path + '/hukabao.apk'});
+              .invokeMethod('install', {'path':file});
         } else if (defaultTargetPlatform == Platform.isIOS) {
           await platform
-              .invokeMethod('install', {'path': path + '/hukabao.ipa'});
+              .invokeMethod('install', {'path': file});
         }
-
+        print('安装完了？？？……');
 
       } on PlatformException catch (_) {
         print('安装出问题了');
@@ -289,10 +282,10 @@ class UpdateApp {
 //以下分快续传
   /// Downloading by spiting as file in chunks
   Future downloadWithChunks(
-      url,
-      savePath, {
-        ProgressCallback onReceiveProgress,
-      }) async {
+    url,
+    savePath, {
+    ProgressCallback onReceiveProgress,
+  }) async {
     const firstChunkSize = 102;
     const maxChunk = 3;
 
@@ -324,7 +317,7 @@ class UpdateApp {
 
     Future mergeTempFiles(chunk) async {
       File f = File(savePath + "temp0");
-      IOSink ioSink= f.openWrite(mode: FileMode.writeOnlyAppend);
+      IOSink ioSink = f.openWrite(mode: FileMode.writeOnlyAppend);
       for (int i = 1; i < chunk; ++i) {
         File _f = File(savePath + "temp$i");
         await ioSink.addStream(_f.openRead());
@@ -336,8 +329,10 @@ class UpdateApp {
 
     Response response = await downloadChunk(url, 0, firstChunkSize, 0);
     if (response.statusCode == 206) {
-      total = int.parse(
-          response.headers.value(HttpHeaders.contentRangeHeader).split("/").last);
+      total = int.parse(response.headers
+          .value(HttpHeaders.contentRangeHeader)
+          .split("/")
+          .last);
       int reserved = total -
           int.parse(response.headers.value(HttpHeaders.contentLengthHeader));
       int chunk = (reserved / firstChunkSize).ceil() + 1;
@@ -357,5 +352,4 @@ class UpdateApp {
       await mergeTempFiles(chunk);
     }
   }
-
 }

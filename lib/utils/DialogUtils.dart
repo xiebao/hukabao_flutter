@@ -3,9 +3,7 @@ import 'dart:async';
 import 'dart:core';
 import '../components/ToastDialog.dart';
 import '../components/LoadingDialog.dart';
-import '../routers/application.dart';
 import '../model/globle_model.dart';
-import '../globleConfig.dart';
 
 class DialogUtils extends Dialog {
   static Widget uircularProgress(){

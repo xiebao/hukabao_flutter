@@ -8,7 +8,7 @@ class OrderCell {
 
   String orderBondPer;
   String content;
-  String create_time;
+  String createtime;
   String planText;
 
   String orderCard;
@@ -24,7 +24,7 @@ class OrderCell {
     this.orderCharge,
     this.orderBondPer,
     this.content,
-    this.create_time,
+    this.createtime,
     this.planText,
     this.orderCard,
     this.orderTime,
@@ -44,7 +44,7 @@ class OrderCell {
       orderBondPer: json['orderBondPer'] ?? '',
       content: json['content'] ?? '',
       planText: json['planText'] ?? '',
-      create_time: json['create_time'] ?? '',
+      createtime: json['create_time'] ?? '',
       orderTime: json['planPayTime'] ?? '',
 
       status:statlist[json['status']]??'异常'

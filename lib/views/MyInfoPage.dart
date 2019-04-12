@@ -169,8 +169,6 @@ String _token;
     // TODO: implement initState
     super.initState();
     final model = globleModel().of(context);
-    print("----------------------${model.token}-------------------------------------");
-    print(model.token) ;
     _token=model.token;
     if(_token=='') {
       DialogUtils.close2Logout(context);

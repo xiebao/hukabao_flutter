@@ -170,7 +170,6 @@ class LoginPageState extends State<LoginPage> {
     final model = globleModel().of(context);
     await model.setlogin(token, userinfo);
     print('正在登录到指定位置');
-    //    Navigator.of(context).pop();
     if (userinfo['userActive'] == '0') {
       Navigator.push(
           context,
@@ -178,7 +177,6 @@ class LoginPageState extends State<LoginPage> {
             builder: (context) => activeUser(),
           ));
     } else
-//        Application.run(context, "/home");
       Navigator.pushNamedAndRemoveUntil(
           context, '/home', (Route router) => false);
   }
@@ -311,7 +309,7 @@ class LoginPageState extends State<LoginPage> {
                       fit: BoxFit.cover,
                     )),
                 Text(_loading ? "正在登录中……" : ''),
-                Text(_wechaName != null ? "您好，$_wechaName，首次登录请先绑定账户!" : ''),
+                Text(_wechaName != null ? "您好，$_wechaName" : ''),
                 new Padding(
                   padding: new EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 15.0),
                   child: new Stack(
@@ -401,7 +399,7 @@ class LoginPageState extends State<LoginPage> {
                       child: Padding(
                         padding: EdgeInsets.all(10.0),
                         child: Text(
-                          '登录',
+                          _wechaName != null ?'绑定账户登录': '登录',
                           style: new TextStyle(
                               color: Colors.white, fontSize: 16.0),
                         ),

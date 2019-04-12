@@ -2,9 +2,6 @@ import 'dart:collection';
 import 'package:dio/dio.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../globleConfig.dart'; //用于配置公用常量
-
 
 class YYConfig {
   static bool DEBUG = true;
@@ -146,7 +143,7 @@ class YYRequestManager {
           false,
           errorResponse.statusCode);
     }
-    ;
+
 
     // debug模式打印相关数据
     if (YYConfig.DEBUG) {

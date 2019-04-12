@@ -2,14 +2,14 @@ class MyMsgCell {
   String id;
   String title;
   String content;
-  String create_time;
+  String createtime;
   String status; //状态,订单状态（0=进行中，1=已完成，2=已取消，3=已停止）
 
   MyMsgCell({
     this.id,
     this.title,
     this.content,
-    this.create_time,
+    this.createtime,
     this.status,
   });
 
@@ -19,7 +19,7 @@ class MyMsgCell {
       id: json['id'] ?? '',
         title: json['title'] ?? '',
       content: json['content'] ?? '',
-      create_time: json['create_time'] ?? '',
+      createtime: json['create_time'] ?? '',
       status:statlist[json['status']]??'未知'
     );
   }

@@ -76,8 +76,8 @@ class HttpUtils {
   }
 
   //get请求
-  void get(String url, Function callBack,
-      {Map<String, dynamic> params, Function errorCallBack}) async {
+  Future get(String url, Function callBack,
+      {Map<String, dynamic> params, Function errorCallBack}) async{
     await _request(url, callBack,
         method: GET,
         params: params,
@@ -86,7 +86,7 @@ class HttpUtils {
   }
 
   //没有Token的 post请求
-  static post(BuildContext context, String url, Function callBack,
+  static Future post(BuildContext context, String url, Function callBack,
       {Map<String, dynamic> params}) async {
     dio = createInstance();
     if (params == null || params.isEmpty) {
@@ -121,13 +121,13 @@ class HttpUtils {
   }
 
   //post请求
-  static apipost(BuildContext context, String url, Map<String, dynamic> params,
+  static Future apipost(BuildContext context, String url, Map<String, dynamic> params,
       Function callBack) async {
     await _request(url, callBack, method: POST, params: params, context: context);
   }
 
   //具体的还是要看返回数据的基本结构
-  static void _request(String url, Function callBack,
+  static Future  _request(String url, Function callBack,
       {String method,
       Map<String, dynamic> params,
       Function errorCallBack,
@@ -187,9 +187,6 @@ class HttpUtils {
       }
       String ercd=response.data['error_code'].toString()??'0';
       response.data["error_code"]=ercd;
-
-      print("----return--error_code:-----${response.data['error_code']}--------");
-
       if (ercd== '-2') {
         print(response.data);
         print('error_code==-2,重新登录111------');
@@ -223,7 +220,7 @@ class HttpUtils {
 
 
   //post请求测试
-  apiposttt(BuildContext context, String url, Map<String, String> params,
+  Future  apiposttt(BuildContext context, String url, Map<String, String> params,
       Function callBack) async {
     dio = createInstance();
     String token = await HttpUtils().theToken;

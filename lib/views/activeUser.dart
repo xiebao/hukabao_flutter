@@ -1,13 +1,11 @@
+import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import '../utils/HttpUtils.dart';
 import '../utils/DialogUtils.dart';
 import '../routers/application.dart';
 import 'package:barcode_scan/barcode_scan.dart';
-import 'dart:async';
-import 'package:flutter/services.dart';
-
-//https://juejin.im/post/5b700d2d6fb9a0098b251462
-
+import '../model/globle_model.dart';
 
 class activeUser extends StatefulWidget {
   @override
@@ -28,7 +26,8 @@ class activeUserState extends State<activeUser> {
       form.save();
       String codestr = _codeCtrl.text.trim();
       if (codestr == '') return;
-      String token = await HttpUtils().theToken;
+      final model =globleModel().of(context);
+      String token= model.token;
       if (token == '')
         DialogUtils.close2Logout(context);
 

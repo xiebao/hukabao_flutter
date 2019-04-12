@@ -94,7 +94,7 @@ class orderListPageState extends State<orderListPage> {
                           '手续费：${subject.orderCharge}'
                       ),
                       Text(
-                          '创建时间：${subject.create_time}'
+                          '创建时间：${subject.createtime}'
                       ),
                       const SizedBox(height: 5.0),
                     ],

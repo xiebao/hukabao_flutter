@@ -199,8 +199,8 @@ class homePageState extends State<homePage>
   Future<bool> _doubleExit() async{
     int nowTime = new DateTime.now().microsecondsSinceEpoch;
     if (_lastClickTime != 0 && nowTime - _lastClickTime > 1500) {
-      return await _onWillPop().then((rv){
-         rv ? _exitApp():  new Future.value(false);
+       await _onWillPop().then((rv){
+         rv ? _exitApp(): new  Future.value(false);
       });
       return new Future.value(true);
     } else {
@@ -208,8 +208,8 @@ class homePageState extends State<homePage>
       new Future.delayed(const Duration(milliseconds: 1500), () {
         _lastClickTime = 0;
       });
-      return await _onWillPop().then((rv){
-         rv ? _exitApp():  new Future.value(false);
+       await _onWillPop().then((rv){
+         rv ? _exitApp(): new Future.value(false);
       });
       return new Future.value(true);
     }

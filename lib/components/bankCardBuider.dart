@@ -94,7 +94,7 @@ class CardDataItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            data.cardType=='2'? _buildContainer("还款日${data.bankRepayDate} 账单日${data.bankBill}",sml: true):_buildContainer('储蓄卡'),
+            data.cardType=='2'? _buildContainer( "账单日${data.bankBill} 还款日${data.bankRepayDate}",sml: true):_buildContainer('储蓄卡'),
             _buildContainer(data.name),
           ],
         ),
