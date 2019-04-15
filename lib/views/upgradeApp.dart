@@ -2,23 +2,24 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:core';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:package_info/package_info.dart';
-import 'package:simple_permissions/simple_permissions.dart';
 import '../globleConfig.dart';
 import '../utils/updateApp.dart';
 import '../utils/DialogUtils.dart';
 
-//import 'package:flutter_downloader/flutter_downloader.dart';
-//import 'package:open_file/open_file.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:open_file/open_file.dart';
 
 
 class upgGradePage extends StatefulWidget {
   @override
   upgGradePageState createState() => new upgGradePageState();
 }
+
 
 class upgGradePageState extends State<upgGradePage> {
 
@@ -83,8 +84,8 @@ class upgGradePageState extends State<upgGradePage> {
             _newVersioncontent="${response.data["update"]['ver']}(${newVersion}):${response.data["update"]['title']}:${response.data["update"]['content']} ";
           });
 
-          await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
-          if (await SimplePermissions.checkPermission(Permission.WriteExternalStorage)) {
+
+          if (await UpdateApp().checkPermission()) {
 
             if (newVersion.compareTo(packageInfo.buildNumber) > 0) {
                 print(newVersion+"|compareTo|"+packageInfo.buildNumber);
@@ -101,60 +102,7 @@ class upgGradePageState extends State<upgGradePage> {
     return retslt;
   }
 
-  Future webdownload() async {
-   bool ischecked= await checkInfo();
-   print("检查是否可以升级:$ischecked ");
-   print(ischecked==true?"yes":"no");
-
-   if(ischecked==false)  return false;
-
-    Dio dio = UpdateApp.createInstance();
-    final path = await UpdateApp().apkLocalPath;
-
-    String url,savePath;
-   var nowTime = DateTime.now();
-//   String fileround=nowTime.year.toString()+nowTime.day.toString()+nowTime.hour.toString()+nowTime.minute.toString()+nowTime.microsecond.toString();
-    if (_ostypename == TargetPlatform.android) {
-      url= "https://down.hukabao.com/andriod/app-release-flutter.apk";
-//      savePath="${path}/hukabao${fileround}.apk";
-    } else if (_ostypename == Platform.isIOS) {
-      print('ios down!');
-      url=  "itms-services://?action=download-manifest&url=https:/down.hukabao.com/ios/hkb.plist'";
-//      savePath="$path/hukabao${fileround}.ipa";
-    }
-   print('准备下载:'+path);
-
-    Response downresponse = await dio.download(url,savePath,onReceiveProgress: (received, total) {
-       _downloading(context, received, total);
-    });
-    print('下载结束完成了');
-    await UpdateApp().installApk(path+"app-release-flutter.apk");
-//    OpenFile.open(path+"app-release-flutter.apk");
-//    OpenFile.open(path);
-/*    final taskId = await FlutterDownloader.enqueue(
-      url: url,
-      savedDir: path,
-      showNotification: true, // show download progress in status bar (for Android)
-      openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-    );
-
-    FlutterDownloader.registerCallback((id, status, progress) {
-      print(
-          'Download task ($id) is in status ($status) and process ($progress)');
-      if (status == DownloadTaskStatus.complete) {
-        print('下载结束完成了');
-        OpenFile.open(path);
-        FlutterDownloader.open(taskId: id);
-      }
-
-    });*/
-
-
-  }
-/*
-
-
-  Future _downAndInstall() async {
+  Future _downApp() async {
     bool ischecked= await checkInfo();
     print("检查是否可以升级:$ischecked ");
     print(ischecked==true?"yes":"no");
@@ -162,7 +110,7 @@ class upgGradePageState extends State<upgGradePage> {
     if(ischecked==false)  return false;
 
 
-    String _finalApkPath = await UpdateApp().apkLocalPath;;
+    String _finalApkPath = await UpdateApp().apkLocalPath;
     String fileName = 'app-release.apk';
     String url;
      if (_ostypename == TargetPlatform.android) {
@@ -184,37 +132,31 @@ class upgGradePageState extends State<upgGradePage> {
       true, // click on notification to open downloaded file (for Android)
     );
     await FlutterDownloader.loadTasks();
-    FlutterDownloader.registerCallback((id, status, progress) {
-      setState(() {
-        _loading=progress/100;
-      });
-      print(
-          'Download task ($id) is in status ($status) and process ($progress) status ${DownloadTaskStatus.complete} _finalApkPath=$_finalApkPath');
-      if (taskId == id && status == DownloadTaskStatus.complete) {
-        OpenFile.open(_finalApkPath);
-        FlutterDownloader.open(taskId: id);
+    print(taskId);
+    FlutterDownloader.registerCallback((id, status, progress) async{
+      if(taskId == id ){
+        setState(() {
+          _loading=progress/100;
+        });
+//      Download task (15611644-4733-4e1e-904e-049bef296db4) is in status (DownloadTaskStatus(3)) and process (100) status DownloadTaskStatus(3) _finalApkPath=/storage/emulated/0
+        print(
+            'Download task ($id) is in status ($status) and process ($progress) status ${DownloadTaskStatus.complete} _finalApkPath=$_finalApkPath');
+        if (status == DownloadTaskStatus.complete) {
+        await  OpenFile.open(_finalApkPath+"/"+fileName);
+        await  FlutterDownloader.open(taskId: id);
+          //  Navigator.pop(context);
+       SystemChannels.platform.invokeMethod('SystemNavigator.pop'); //关闭App
+
+        }
       }
+
     });
-  }
-
-*/
-
-  void _downloading(context, int received, int total){
-    if (total != -1) {
-      print("正在下载……");
-      print((received / total * 100).toStringAsFixed(0) + "%");
-      setState(() {
-        _loading=received / total;
-      });
-
-    }
   }
 
   @override
   void initState() {
     super.initState();
-    webdownload();
-//    _downAndInstall();
+    _downApp();
   }
 
   @override

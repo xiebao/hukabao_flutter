@@ -44,22 +44,25 @@ dependencies:
   scoped_model: ^1.0.1
 
   #二维码扫描-用户激活-注意andriod和ios获取相机权限
-#  barcode_scan: any
+  barcode_scan: ^1.0.0
 #  image_picker: 0.4.12+1
 #  video_player: ^0.8.0
 
   #  微信
   fluwx: ^0.6.1
   event_bus: any
-  connectivity: any
+  connectivity: ^0.4.2+2
   english_words: ^3.1.0
 
   path_provider: ^0.4.1
-  package_info: ^0.4.0
-  simple_permissions: ^0.1.9
 
-#  flutter_downloader: ^1.1.6
-#  open_file: ^2.0.1+1
+#  simple_permissions: ^0.1.9
+
+  package_info: ^0.4.0+2
+  flutter_downloader: ^1.1.6
+  open_file: ^2.0.1+1
+  permission_handler: ^3.0.0
+
 
 dev_dependencies:
   flutter_test:

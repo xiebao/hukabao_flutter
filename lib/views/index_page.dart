@@ -82,7 +82,7 @@ class IndexPageState extends State<IndexPage>
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, top, 0, 10.0),
-                  child: SwipPage(widget.picList),
+                  child:SwipPage(widget.picList),
                 ), //, //
                 Expanded(
                   child: IndexModelList(_listData),

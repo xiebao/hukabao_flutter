@@ -7,7 +7,8 @@ import 'package:dio/dio.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:package_info/package_info.dart';
-import 'package:simple_permissions/simple_permissions.dart';
+//import 'package:simple_permissions/simple_permissions.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../globleConfig.dart';
 import '../utils/DialogUtils.dart';
 
@@ -68,6 +69,23 @@ class UpdateApp {
     return result;
   }
 
+  Future<bool> checkPermission() async {
+    PermissionStatus permission = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.storage);
+    if (permission != PermissionStatus.granted) {
+      Map<PermissionGroup, PermissionStatus> permissions =
+      await PermissionHandler()
+          .requestPermissions([PermissionGroup.storage]);
+      if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
+        return true;
+      }
+    } else {
+      return true;
+    }
+    return false;
+  }
+  /*
+//  simple_permissions: ^0.1.9
   //打开权限
   Future<PermissionStatus> requestPermission() async {
     print('requestPermission');
@@ -77,16 +95,16 @@ class UpdateApp {
   //是否有权限
   Future<bool> checkPermission() async {
     print('checkPermission');
-    /* await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
+    *//* await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
     await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
 
-    bool isReadPermissionGranted = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);*/
+    bool isReadPermissionGranted = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);*//*
     bool res = await SimplePermissions.checkPermission(
         Permission.WriteExternalStorage);
     print(res);
     return res;
   }
-
+*/
   //处理异常
   static void _handError(String errorMsg, {BuildContext context}) {
     print("<net> errorMsg :" + errorMsg);
@@ -136,11 +154,10 @@ class UpdateApp {
           print(packageInfo.buildNumber); //1
           print(packageInfo.appName);
           print(defaultTargetPlatform);*/
-          await SimplePermissions.requestPermission(
-              Permission.WriteExternalStorage);
+//          await SimplePermissions.requestPermission(  Permission.WriteExternalStorage);
 
-          if (await SimplePermissions.checkPermission(
-              Permission.WriteExternalStorage)) {
+//          if (await SimplePermissions.checkPermission(Permission.WriteExternalStorage)) {
+        if(await checkPermission()){
             if (newVersion.compareTo(packageInfo.version) > 0) {
               isupdate = true;
             }
@@ -190,11 +207,12 @@ class UpdateApp {
           print(packageInfo.buildNumber); //1
           print(packageInfo.appName);
           print(defaultTargetPlatform);*/
-          await SimplePermissions.requestPermission(
+  /*        await SimplePermissions.requestPermission(
               Permission.WriteExternalStorage);
 
           if (await SimplePermissions.checkPermission(
-              Permission.WriteExternalStorage)) {
+              Permission.WriteExternalStorage)) {*/
+          if(await checkPermission()){
             if (newVersion.compareTo(packageInfo.version) > 0) {
               DialogUtils().showMyDialog(context, '有更新版本，是否马上更新?').then((rv) {
                 return rv ? downloadApp(context) : false;
