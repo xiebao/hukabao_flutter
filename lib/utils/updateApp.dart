@@ -68,15 +68,18 @@ class UpdateApp {
     }
     return result;
   }
-
   Future<bool> checkPermission() async {
-    PermissionStatus permission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.storage);
-    if (permission != PermissionStatus.granted) {
-      Map<PermissionGroup, PermissionStatus> permissions =
-      await PermissionHandler()
-          .requestPermissions([PermissionGroup.storage]);
-      if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      PermissionStatus permission = await PermissionHandler()
+          .checkPermissionStatus(PermissionGroup.storage);
+      if (permission != PermissionStatus.granted) {
+        Map<PermissionGroup, PermissionStatus> permissions =
+        await PermissionHandler()
+            .requestPermissions([PermissionGroup.storage]);
+        if (permissions[PermissionGroup.storage] == PermissionStatus.granted) {
+          return true;
+        }
+      } else {
         return true;
       }
     } else {
@@ -84,6 +87,7 @@ class UpdateApp {
     }
     return false;
   }
+
   /*
 //  simple_permissions: ^0.1.9
   //打开权限
@@ -280,17 +284,15 @@ class UpdateApp {
       try {
         print('正在准备安装……');
 
-        SystemChannels.platform.invokeMethod('SystemNavigator.pop'); //关闭App
 
         if (defaultTargetPlatform == TargetPlatform.android) {
-          await platform
-              .invokeMethod('install', {'path':file});
+           platform.invokeMethod('install', {'path':file});
         } else if (defaultTargetPlatform == Platform.isIOS) {
-          await platform
-              .invokeMethod('install', {'path': file});
+           platform.invokeMethod('install', {'path': file});
         }
         print('安装完了？？？……');
 
+        SystemChannels.platform.invokeMethod('SystemNavigator.pop'); //关闭App
       } on PlatformException catch (_) {
         print('安装出问题了');
       }

@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:io';
+//import 'dart:io';
+import 'package:package_info/package_info.dart';
 import 'package:flutter/material.dart';
 import 'routers/application.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,7 +9,8 @@ import './utils/HttpUtils.dart';
 import './utils/DialogUtils.dart';
 import './utils/updateApp.dart';
 import './views/upgradeApp.dart';
-import 'package:package_info/package_info.dart';
+
+import './views/appVersion.dart' show AppVersion;
 
 class SplashPage extends StatefulWidget {
   @override
@@ -42,6 +44,7 @@ class SplashState extends State<SplashPage> {
           prefs.setString("update", 'no');
         } else {
           prefs.remove('update');
+//          AppVersion().check(context);
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (_) => upgGradePage()),
@@ -162,5 +165,20 @@ import 'package:path_provider/path_provider.dart';
     print(fil);
     var dirbool = await fil.exists(); //返回真假
     print(dirbool);
-  }*/
+  }
+
+
+  localPath(String filepath) async {
+    var file = File(filepath);
+    try {
+      bool exists = await file.exists();
+      if (!exists) {
+        await file.create();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  */
 }
