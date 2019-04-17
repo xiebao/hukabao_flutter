@@ -46,12 +46,9 @@ android {
         applicationId "com.sstech.card"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 14
-        versionName "1.1.4"
-//        versionCode flutterVersionCode.toInteger()
-//        versionName flutterVersionName
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-//        multiDexEnabled true
     }
 
     signingConfigs {
