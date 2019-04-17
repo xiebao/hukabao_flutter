@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import '../routers/application.dart';
 import '../model/index_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class SwipPage extends StatelessWidget {
   List<PicsCell> picList;
@@ -20,11 +21,15 @@ class SwipPage extends StatelessWidget {
             ? Text('没有显示的')
             : Swiper(
                 itemBuilder: (BuildContext context, int index) {
-                  return new Image.network(
-                    picList[index].imgurl,
-                    fit: BoxFit.fitWidth,
-                    width: MediaQuery.of(context).size.width,
+                  return  CachedNetworkImage(
+                    placeholder: (context, url) =>Text('欢迎来到护卡宝'),// new CircularProgressIndicator(),
+                    imageUrl: picList[index].imgurl,
                   );
+//                  return new Image.network(
+//                    picList[index].imgurl,
+//                    fit: BoxFit.fitWidth,
+//                    width: MediaQuery.of(context).size.width,
+//                  );
                 },
                 loop: false,
                 itemCount: picList.length,

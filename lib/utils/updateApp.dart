@@ -68,6 +68,7 @@ class UpdateApp {
     }
     return result;
   }
+
   Future<bool> checkPermission() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       PermissionStatus permission = await PermissionHandler()
@@ -87,8 +88,8 @@ class UpdateApp {
     }
     return false;
   }
+/*
 
-  /*
 //  simple_permissions: ^0.1.9
   //打开权限
   Future<PermissionStatus> requestPermission() async {
@@ -99,16 +100,17 @@ class UpdateApp {
   //是否有权限
   Future<bool> checkPermission() async {
     print('checkPermission');
-    *//* await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
+     await SimplePermissions.requestPermission(Permission.ReadExternalStorage);
     await SimplePermissions.requestPermission(Permission.WriteExternalStorage);
 
-    bool isReadPermissionGranted = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);*//*
+    bool isReadPermissionGranted = await SimplePermissions.checkPermission(Permission.ReadExternalStorage);
     bool res = await SimplePermissions.checkPermission(
         Permission.WriteExternalStorage);
     print(res);
     return res;
   }
 */
+
   //处理异常
   static void _handError(String errorMsg, {BuildContext context}) {
     print("<net> errorMsg :" + errorMsg);
@@ -278,7 +280,7 @@ class UpdateApp {
 
   // 安装
   Future<Null> installApk(String file) async {
-    const platform = const MethodChannel('com.hukabao.flutter.xiebaoxin');
+    const platform = const MethodChannel('com.hukabao.flutter.xiebaoxin/upgrade');
 //    final path = await _apkLocalPath;
     await apkLocalPath.then((path) async {
       try {

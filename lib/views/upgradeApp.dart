@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:core';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
@@ -19,7 +20,7 @@ class upgGradePage extends StatefulWidget {
 }
 
 class upgGradePageState extends State<upgGradePage> {
-  String _taskId, _finalApkPath, _fileName,_localPath;
+  String _taskId, _finalApkPath, _fileName, _localPath;
 
   double _loading = 0.0;
   String _packageInfovs, _packageInfobn;
@@ -75,7 +76,7 @@ class upgGradePageState extends State<upgGradePage> {
           String newVersion = response.data["update"]['verCode'].toString();
           setState(() {
             _newVersioncontent =
-            "${response.data["update"]['ver']}(${newVersion}):${response.data["update"]['title']}:${response.data["update"]['content']} ";
+                "${response.data["update"]['ver']}(${newVersion}):${response.data["update"]['title']}:${response.data["update"]['content']} ";
           });
 
           if (await UpdateApp().checkPermission()) {
@@ -93,6 +94,7 @@ class upgGradePageState extends State<upgGradePage> {
     }
     return retslt;
   }
+
   Future _downApp() async {
     bool ischecked = await checkInfo();
     print("检查是否可以升级:$ischecked ");
@@ -105,7 +107,7 @@ class upgGradePageState extends State<upgGradePage> {
 
     await UpdateApp().checkPermission();
     setState(() {
-      _localPath = _finalApkPath+ '/Download';
+      _localPath = _finalApkPath + '/Download';
     });
     final savedDir = Directory(_localPath);
     bool hasExisted = await savedDir.exists();
@@ -114,8 +116,12 @@ class upgGradePageState extends State<upgGradePage> {
     }
 
     var nowTime = DateTime.now();
-    String fileround=nowTime.year.toString()+nowTime.day.toString()+nowTime.hour.toString()+nowTime.minute.toString()+nowTime.microsecond.toString();
-     _fileName = 'hukabao${fileround}.apk';//'app-release-flutter.apk';
+    String fileround = nowTime.year.toString() +
+        nowTime.day.toString() +
+        nowTime.hour.toString() +
+        nowTime.minute.toString() +
+        nowTime.microsecond.toString();
+    _fileName = 'hukabao${fileround}.apk'; //'app-release-flutter.apk';
 
     String url;
     if (_ostypename == TargetPlatform.android) {
@@ -133,25 +139,27 @@ class upgGradePageState extends State<upgGradePage> {
       url: url,
       savedDir: _localPath,
       fileName: _fileName,
-      showNotification:true, // show download progress in status bar (for Android)
-      openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+      showNotification:
+          true, // show download progress in status bar (for Android)
+      openFileFromNotification:
+          true, // click on notification to open downloaded file (for Android)
     );
 
     setState(() {
-      _taskId=taskId;
+      _taskId = taskId;
     });
-
-
   }
- void initdown() async{
+
+  void initdown() async {
     await _downApp();
-}
+  }
+
   @override
   void initState() {
     super.initState();
 //    FlutterDownloader.cancelAll();
 
-    FlutterDownloader.registerCallback((id, status, progress) {
+    FlutterDownloader.registerCallback((id, status, progress) async {
       print(
           'Download task ($id) is in status ($status) and process ($progress) status ${DownloadTaskStatus.complete} _localPath=$_localPath');
       setState(() {
@@ -159,10 +167,34 @@ class upgGradePageState extends State<upgGradePage> {
       });
       if (_taskId == id && status == DownloadTaskStatus.complete) {
         print('下载完成了$_localPath');
+        var result = await MethodChannel(
+                "com.hukabao.flutter.xiebaoxin/channel", StandardMethodCodec())
+            .invokeMethod("install", {"appfile": _localPath + "/" + _fileName});
+        print(result);
+
+//        if (result == "NO") {
+          if (await DialogUtils()
+              .showMyDialog(context, '已下载完成，请确认打开应用内升级安装权限，是否安装新版本?')) {
+            await MethodChannel("com.hukabao.flutter.xiebaoxin/channel",
+                    StandardMethodCodec())
+                .invokeMethod(
+                    "install", {"appfile": _localPath + "/" + _fileName});
+          } else
+            Navigator.of(context).pop();
+//        }
+        /*
         OpenFile.open(_localPath+ "/" + _fileName);
-        FlutterDownloader.open(taskId: id);
-        //  Navigator.pop(context);
-//      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+        FlutterDownloader.open(taskId: id);*/
+
+        /*
+        import 'package:install_plugin/install_plugin.dart';install_plugin  2.0.0
+         InstallPlugin.installApk(_apkFilePath, 'com.zaihui.installpluginexample')
+          .then((result) {
+        print('install apk $result');
+      }).catchError((error) {
+        print('install apk error: $error');
+      });
+      */
       }
     });
     initdown();
@@ -186,8 +218,8 @@ class upgGradePageState extends State<upgGradePage> {
                   Text("新版本信息:$_newVersioncontent"),
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(_loading > 0.8
-                          ? "请注意稍后提示打开容许安装权限，然后等待弹出安装后再重启App！"
+                      child: Text(_loading > 0.9
+                          ? "请注意稍后提示打开应用内安装权限，"
                           : "已下载：${(_loading * 100).toStringAsFixed(0)}%")),
                   LinearProgressIndicator(
                     backgroundColor: Colors.blue,
@@ -209,5 +241,4 @@ class upgGradePageState extends State<upgGradePage> {
     FlutterDownloader.cancelAll();
     FlutterDownloader.remove(taskId: _taskId);
   }
-
 }

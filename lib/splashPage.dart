@@ -1,5 +1,5 @@
 import 'dart:async';
-//import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:flutter/material.dart';
 import 'routers/application.dart';
@@ -9,8 +9,6 @@ import './utils/HttpUtils.dart';
 import './utils/DialogUtils.dart';
 import './utils/updateApp.dart';
 import './views/upgradeApp.dart';
-
-import './views/appVersion.dart' show AppVersion;
 
 class SplashPage extends StatefulWidget {
   @override
@@ -44,8 +42,8 @@ class SplashState extends State<SplashPage> {
           prefs.setString("update", 'no');
         } else {
           prefs.remove('update');
-//          AppVersion().check(context);
-          Navigator.pushAndRemoveUntil(
+//          await MethodChannel("com.hukabao.flutter.xiebaoxin/channel", StandardMethodCodec()).invokeMethod("installtest", {"appfile": '/storage/emulated/0/Download/hkb.apk'});
+                Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (_) => upgGradePage()),
               (Route router) => false);

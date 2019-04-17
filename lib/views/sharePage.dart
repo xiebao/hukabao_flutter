@@ -8,6 +8,7 @@ import '../utils/DialogUtils.dart';
 import '../model/index_model.dart';
 import '../model/globle_model.dart';
 import 'package:fluwx/fluwx.dart' as fluwx;
+import 'package:cached_network_image/cached_network_image.dart';
 
 class sharePage extends StatefulWidget {
   @override
@@ -112,10 +113,15 @@ class sharePageState extends State<sharePage>
           : Swiper(
               scrollDirection: Axis.horizontal,
               itemBuilder: (BuildContext context, int index) {
-                return Image.network(
+//                return Image(image: new CachedNetworkImageProvider(_picList[index].imgurl));
+                return  CachedNetworkImage(
+                  placeholder: (context, url) => new CircularProgressIndicator(),
+                  imageUrl: _picList[index].imgurl,
+                );
+              /*  return Image.network(
                   _picList[index].imgurl,
                   fit: BoxFit.fill,
-                );
+                );*/
               },
               itemCount: _picList.length,
               scale: 0.8,

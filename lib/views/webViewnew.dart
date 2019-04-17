@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import '../utils/DialogUtils.dart';
-import '../components/loading_gif.dart';
 import '../globleConfig.dart';
 
 class WebView extends StatefulWidget {
