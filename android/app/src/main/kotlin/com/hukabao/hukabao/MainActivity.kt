@@ -103,12 +103,11 @@ class MainActivity: FlutterActivity() {
    */
 
   @RequiresApi(api = Build.VERSION_CODES.O)
-  private fun startInstallPermissionSettingActivity(packageUri:Uri) {
+  private fun startInstallPermissionSettingActivity() {
     //注意这个是8.0新API
-    val intent1 = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,packageUri)
-    intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    startActivity(intent)
-    startActivityForResult(intent1, 999)
+    val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES)
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    this.startActivity(intent)
 
   }
 
