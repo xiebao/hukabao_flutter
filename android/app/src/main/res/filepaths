@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--<external-path name="external_files" path="."/>
+    等同於Context.getExternalFilesDir(String) / Context.getExternalFilesDir(null) : /storage/emulated/0/Android/data/com.xxx.app/files/image-->
+    <external-files-path name="name" path="Download" />
+    <!--等同於Environment.getExternalStorageDirectory() : /storage/emulated/0／image-->
+</paths>
