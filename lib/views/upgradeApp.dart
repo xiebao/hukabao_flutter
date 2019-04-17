@@ -8,7 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:package_info/package_info.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:open_file/open_file.dart';
+//import 'package:open_file/open_file.dart';
 import '../globleConfig.dart';
 import '../utils/updateApp.dart';
 import '../utils/DialogUtils.dart';
