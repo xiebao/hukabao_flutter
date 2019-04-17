@@ -180,7 +180,7 @@ class upgGradePageState extends State<upgGradePage> {
                 .invokeMethod(
                     "install", {"appfile": _localPath + "/" + _fileName});
           } else
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
 //        }
         /*
         OpenFile.open(_localPath+ "/" + _fileName);

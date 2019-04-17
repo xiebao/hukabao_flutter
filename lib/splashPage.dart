@@ -43,10 +43,23 @@ class SplashState extends State<SplashPage> {
         } else {
           prefs.remove('update');
 //          await MethodChannel("com.hukabao.flutter.xiebaoxin/channel", StandardMethodCodec()).invokeMethod("installtest", {"appfile": '/storage/emulated/0/Download/hkb.apk'});
-                Navigator.pushAndRemoveUntil(
+        /*        Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (_) => upgGradePage()),
-              (Route router) => false);
+              (Route router) => false);*/
+
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => upgGradePage(),
+            ),
+          ).then((result) {
+            if(result){
+              _isupdate=false;
+              prefs.setString("update", 'no');
+            }
+          });
+
         }
       }
     }

@@ -6,14 +6,12 @@ import android.os.Build
 import android.os.Bundle
 
 import io.flutter.app.FlutterActivity
-import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugins.GeneratedPluginRegistrant
 
 import java.io.File
 import android.app.Activity
 import android.content.Context
-import android.net.http.HttpResponseCache.install
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import android.provider.Settings
