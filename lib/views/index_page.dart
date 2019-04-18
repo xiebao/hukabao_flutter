@@ -62,10 +62,6 @@ class IndexPageState extends State<IndexPage>
     return SafeArea(
       top: false,
       bottom: true,
-//      child: new
-//
-//      return Center(
-
       child: !_isRequesting
           ? Center(
               child:
@@ -77,6 +73,7 @@ class IndexPageState extends State<IndexPage>
 //              DialogUtils.uircularProgress(),
             )
           : Column(
+              mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[

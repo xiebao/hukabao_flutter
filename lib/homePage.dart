@@ -140,38 +140,7 @@ class homePageState extends State<homePage>
           ),
           ):Text('请退出登录')
       );
-/*
-      return new CupertinoApp(
-        title: "护卡宝",
-        theme: new CupertinoThemeData(
-          primaryColor: CupertinoColors.darkBackgroundGray,
-        ),
-        routes: _routes,
-        home: new CupertinoTabScaffold(
-          tabBar: CupertinoTabBar(
-            items: getBottomNavigationBarItem(),
-            currentIndex: _tabIndex,
-            onTap: (index) {
-              setState(() {
-                _tabIndex = index;
-              });
-            },
-          ),
-          tabBuilder: (BuildContext context, int index) {
-            return CupertinoTabView(
-              builder: (BuildContext context) {
-                return CupertinoPageScaffold(
-                  child: _pages[index],
-                  // navigationBar: CupertinoNavigationBar(
-                  //   middle: Text(tabTitles[index]),
-                  //   trailing: _trailingButtons[index],
-                  // ),
-                );
-              },
-            );
-          },
-        ),
-      );*/
+
     }
 
 

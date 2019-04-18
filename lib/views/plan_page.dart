@@ -1,3 +1,4 @@
+import 'dart:core';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -130,8 +131,21 @@ class planPageState extends State<planPage> {
 
   void _submit() async {
     try {
-      DateTime time1 = DateTime.parse(_startDayCtroller.text);
-      DateTime time2 = DateTime.parse(_endDayCtroller.text);
+      String billday= _cardsList[_indexcard].bankBill;
+      String endpayday=_cardsList[_indexcard].bankRepayDate;
+
+      DateTime nowTime = DateTime.now();
+      DateTime time1 = DateTime.parse(_startDayCtroller.text.trim());
+      DateTime time2 = DateTime.parse(_endDayCtroller.text.trim());
+      print(_startDayCtroller.text);
+      print(_endDayCtroller.text);
+
+      DateTime nowtimeflg=DateTime.parse("${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${nowTime.day.toString().padLeft(2, '0')}");
+      if (time1.isBefore(nowtimeflg)) {
+          await  DialogUtils.showToastDialog(context,  "开始日期至少从今天开始");
+          return;
+      }
+
       if (time1.isBefore(time2)) {
         Duration duration = time2.difference(time1);
         if (duration.inDays <= 2) {
@@ -142,19 +156,52 @@ class planPageState extends State<planPage> {
        await DialogUtils.showToastDialog(context,  "开始日期必须早于结束日期");
         return;
       }
+print(time2.difference(time1).inDays);
+
+     DateTime billdaytimeflg= DateTime.now();
+     if(nowTime.day<int.parse(billday))
+           billdaytimeflg=DateTime.parse("${nowTime.year.toString()}-${(nowTime.month-1).toString().padLeft(2, '0')}-${billday.padLeft(2, '0')}");
+     else
+        billdaytimeflg=DateTime.parse("${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${billday.padLeft(2, '0')}");
+
+     if (time1.isBefore(billdaytimeflg)) {
+        await DialogUtils.showToastDialog(context,  "开始日期必须在账单日之后");
+        return;
+      }
+
+      DateTime endpaydaytimeflg= DateTime.now();
+      if(nowTime.day>int.parse(endpayday))
+        endpaydaytimeflg=DateTime.parse("${nowTime.year.toString()}-${(nowTime.month+1).toString().padLeft(2, '0')}-${endpayday.padLeft(2, '0')}");
+      else
+        endpaydaytimeflg=DateTime.parse("${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${endpayday.padLeft(2, '0')}");
+      if (time1.isAfter(endpaydaytimeflg)) {
+        await DialogUtils.showToastDialog(context,  "结束日期必须在还款日之前");
+        return;
+      }
+
     } catch (e) {
+      print(e.toString());
       await DialogUtils.showToastDialog(context,  "日期格式错误");
       return;
     }
 
     final form = _formKey.currentState;
     if (form.validate()) {
+      if(int.parse(_amountCtroller.text)<500){
+        await DialogUtils.showToastDialog(context,  "计划金额必须不少于500元");
+        return;
+      }
+      if(int.parse(_bandCtroller.text)<100){
+        await DialogUtils.showToastDialog(context,  "保证金金额必须大于100元");
+        return;
+      }
+
       Map<String, String> params = {
         "cardId": _curCardId,
-        "money": _amountCtroller.text,
-        "startTime": _startDayCtroller.text,
-        "endTime": _endDayCtroller.text,
-        "reserved": _bandCtroller.text,
+        "money": _amountCtroller.text.trim(),
+        "startTime": _startDayCtroller.text.trim(),
+        "endTime": _endDayCtroller.text.trim(),
+        "reserved": _bandCtroller.text.trim(),
         "bondPer": "50"
       };
       print(params);
@@ -162,7 +209,6 @@ class planPageState extends State<planPage> {
         showLoadingDialog();
         await HttpUtils.apipost(context, 'Order/planAddOther', params,
             (response) async{
-          print('=================Order/planAddOther======================');
 //          print(response['data']['info']);
           hideLoadingDialog();
           if (response['error_code'] != "-1") {
@@ -328,7 +374,7 @@ class planPageState extends State<planPage> {
       child: new Row(
         children: <Widget>[
           Expanded(
-            flex: 6,
+            flex: 9,
             child: _buildStartDayText(),
           ),
           Expanded(
@@ -338,7 +384,7 @@ class planPageState extends State<planPage> {
             ), //Text('至')
           ),
           Expanded(
-            flex: 5,
+            flex: 9,
             child: _buildEndDayText(),
           ),
         ],

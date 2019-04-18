@@ -166,7 +166,7 @@ class ComFunUtil {
         iType == 'number' ? WhitelistingTextInputFormatter.digitsOnly : null,
       ],
       enabled: enable, // 是否可编辑
-      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 11.0),
       decoration: const BoxDecoration(
         border: Border(
             bottom:

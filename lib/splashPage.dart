@@ -32,7 +32,14 @@ class SplashState extends State<SplashPage> {
   void _checkUpdateApp() async {
     await getNowVersion();
     SharedPreferences prefs = await _prefs;
-    String isupdate ='';//prefs.getString('update') ?? '';
+
+    if(prefs.getString("version")==null|| prefs.getString("version")==''){
+      prefs.setString("version", _packageInfoversion);
+      prefs.setString("ostype", UpdateApp.defaultTargetPlatform.toString());
+    }
+
+//    print(UpdateApp.defaultTargetPlatform.toString());TargetPlatform.android
+    String isupdate =prefs.getString('update') ?? '';
     print("_checkUpdateApp---"+isupdate);
     if (isupdate == '') {
       if (await UpdateApp().checkDownloadApp) {

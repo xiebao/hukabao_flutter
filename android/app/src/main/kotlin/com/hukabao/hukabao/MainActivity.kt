@@ -13,9 +13,10 @@ import java.io.File
 import android.app.Activity
 import android.content.Context
 import android.widget.Toast
-import androidx.core.content.FileProvider
+
 import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 
 class MainActivity: FlutterActivity() {
   private val CHANNEL = "com.hukabao.flutter.xiebaoxin/channel"

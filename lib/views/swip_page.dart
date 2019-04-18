@@ -14,7 +14,7 @@ class SwipPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+        padding: const EdgeInsets.all(0),
         width: MediaQuery.of(context).size.width,
         height: 210,
         child: picList == null || picList == []
@@ -24,12 +24,8 @@ class SwipPage extends StatelessWidget {
                   return  CachedNetworkImage(
                     placeholder: (context, url) =>Text('欢迎来到护卡宝'),// new CircularProgressIndicator(),
                     imageUrl: picList[index].imgurl,
+                    width:  MediaQuery.of(context).size.width,
                   );
-//                  return new Image.network(
-//                    picList[index].imgurl,
-//                    fit: BoxFit.fitWidth,
-//                    width: MediaQuery.of(context).size.width,
-//                  );
                 },
                 loop: false,
                 itemCount: picList.length,

@@ -239,9 +239,12 @@ class LoginPageState extends State<LoginPage> {
                     builder: (context) => register(),
                   ));
             },
-            child: Text(
-              "注册",
-              style: new TextStyle(fontSize: 14.0),
+            child: Container(
+              padding: EdgeInsets.all(15),
+              child: Text(
+                "注册",
+                style: new TextStyle(fontSize: 14.0),
+              ),
             ),
           ),
           InkWell(
@@ -252,9 +255,12 @@ class LoginPageState extends State<LoginPage> {
                     builder: (context) => fogetpwdPage(),
                   ));
             },
-            child: Text(
-              "忘记密码",
-              style: new TextStyle(fontSize: 14.0),
+            child: Container(
+              padding: EdgeInsets.all(15),
+              child: Text(
+                "忘记密码",
+                style: new TextStyle(fontSize: 14.0),
+              ),
             ),
           ),
         ],
@@ -266,17 +272,13 @@ class LoginPageState extends State<LoginPage> {
     return Padding(
         padding: new EdgeInsets.all(10.0),
         child: IconButton(
+          iconSize: 30,
             icon: Image.asset(
               "images/sysicon/icon_wechat.png",
               fit: BoxFit.fill,
             ),
             onPressed: () {
-              fluwx.sendAuth(
-                  scope: "snsapi_userinfo", state: "wechat_sdk_demo_test");
-              /*        .then((data) {
-                print('授权登录结果');
-                print(data);
-              });*/
+              fluwx.sendAuth(scope: "snsapi_userinfo", state: "wechat_sdk_demo_test");
             }));
   }
 
@@ -291,24 +293,17 @@ class LoginPageState extends State<LoginPage> {
           body: SingleChildScrollView(
             child: new Column(
               mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Container(
-                    height: 10,
-                    child: Text(''),
-                  ),
-                ),
+                const SizedBox(height: 35.0),
                 new Padding(
-                    padding: new EdgeInsets.all(30.0),
+                    padding: new EdgeInsets.all(10.0),
                     child: Image.asset(
                       'images/logo.png',
-                      width: 100,
-                      height: 100,
+                      width: 88,
+                      height: 88,
                       fit: BoxFit.cover,
                     )),
-                Text(_loading ? "正在登录中……" : ''),
                 Text(_wechaName != null ? "您好，$_wechaName" : ''),
                 new Padding(
                   padding: new EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 15.0),
@@ -349,7 +344,7 @@ class LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 new Padding(
-                  padding: new EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 40.0),
+                  padding: new EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 30.0),
                   child: new Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

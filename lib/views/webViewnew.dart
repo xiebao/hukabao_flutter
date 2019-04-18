@@ -23,11 +23,9 @@ class _ArticleDetailState extends State<WebView> {
     flutterWebViewPlugin.onStateChanged.listen((state) {
       if (state.type == WebViewState.finishLoad) {
         //有掘金web版本详情页的finished触发时间实在太长，所以这里就省略了hasLoaded的处理,其实也就是为了界面更友好
-        setState(() {
-          print(state.type);
-          hasLoaded = true;
+         print(state.type);
+        hasLoaded = true;
         print("========2222========");
-        });
       }
     });
 
@@ -52,9 +50,13 @@ class _ArticleDetailState extends State<WebView> {
                 style: new TextStyle(color: Colors.white),
               ),
             ),
-            withZoom: false,
+            withZoom: true,
             withLocalStorage: true,
             withJavascript: true,
+            scrollBar: true,
+            enableAppScheme:true,
+            geolocationEnabled: true,
+            resizeToAvoidBottomInset: true,
             initialChild: Container(
               color: Colors.white,
               child: Center(
