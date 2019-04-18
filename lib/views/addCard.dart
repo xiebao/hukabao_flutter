@@ -248,16 +248,13 @@ class addCardState extends State<addCard> {
         "bankRepayDate": _bankRepayDate
       };
 
-      print("----_getsmsCode1---");
-      print(params);
       try {
         showLoadingDialog();
         await HttpUtils.apipost(context, "Index/cardAddFirst", params, (response) async{
-          print(response);
           if (response['error_code'] == '1') {
-            _orderNo = response['data']['orderNo'];
-            _smsSeq = response['data']['smsSeq'];
             setState(() {
+              _orderNo = response['data']['orderNo'].toString()??'';
+              _smsSeq = response['data']['smsSeq'].toString()??'';
               _startTimer();
             });
           }
@@ -310,11 +307,10 @@ class addCardState extends State<addCard> {
   void _initBanklist() async {
     await HttpUtils.apipost(
         context, "Index/cardSelect", {'cardType': widget.cardType}, (response) async{
-      print(response);
+
       if (response['error_code'] == '1') {
         response['data']['bankList'].forEach((ele) {
           if (ele.isNotEmpty) {
-            print(ele);
             _bankPickerData.add(ele['bankName']);
             _bankCodeMap[ele['bankName']] = ele['bankId'];
           }
@@ -325,14 +321,18 @@ class addCardState extends State<addCard> {
   }
 
   void _forSubmitted() async{
-    _cardType = widget.cardType;
-    if( _smsSeq.isEmpty ||  _orderNo.isEmpty){
+    if(!_getsmscode){
       await DialogUtils.showToastDialog(context,  "请先获取验证码");
+      return;
+    }
+    _cardType = widget.cardType;
+    if( _orderNo==null ||  _orderNo==''){
+      await DialogUtils.showToastDialog(context,  "请确认验证码已经收到");
       return;
     }
 
     _verifyCode=_verifyCodeCtrl.text.trim();
-    if (_checkvalue()==true && _verifyCode != '') {
+    if (await _checkvalue() && _verifyCode != '') {
       Map<String, String> params = {
         "cardType": _cardType,
         "name": _name,

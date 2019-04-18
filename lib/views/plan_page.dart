@@ -156,7 +156,8 @@ class planPageState extends State<planPage> {
        await DialogUtils.showToastDialog(context,  "开始日期必须早于结束日期");
         return;
       }
-print(time2.difference(time1).inDays);
+
+      print(time2.difference(time1).inDays);
 
      DateTime billdaytimeflg= DateTime.now();
      if(nowTime.day<int.parse(billday))
@@ -397,6 +398,9 @@ print(time2.difference(time1).inDays);
       onTap: () {
         ComFunUtil.showDatePicker(context, (String data) {
           _startDayCtroller.text = data;
+          setState(() {
+            _isplanreg = true;
+          });
         });
       },
       child: ComFunUtil().buideStandInput(context, '开始日', _startDayCtroller,
@@ -407,11 +411,7 @@ print(time2.difference(time1).inDays);
             }
           },
           tapfun: true,
-          changfun: (_) {
-            setState(() {
-              _isplanreg = true;
-            });
-          }),
+         ),
     );
   }
 
@@ -420,6 +420,9 @@ print(time2.difference(time1).inDays);
       onTap: () {
         ComFunUtil.showDatePicker(context, (date) {
           _endDayCtroller.text = date;
+          setState(() {
+            _isplanreg = true;
+          });
         });
       },
       child: ComFunUtil().buideStandInput(context, '结束日', _endDayCtroller,
@@ -430,11 +433,7 @@ print(time2.difference(time1).inDays);
             }
           },
           tapfun: true,
-          changfun: (_) {
-            setState(() {
-              _isplanreg = true;
-            });
-          }),
+        ),
     );
   }
 

@@ -77,10 +77,7 @@ class fogetpwdPageState extends State<fogetpwdPage> {
         "type": '2',
       };
 
-      print("---Public/smsSend---");
-      print(params);
      await HttpUtils.apipost(context, "Public/smsSend", params, (response) async{
-        print(response);
         if (response['error_code'] == '1') {
           setState(() {
             _startTimer();
@@ -119,7 +116,7 @@ class fogetpwdPageState extends State<fogetpwdPage> {
     super.initState();
   }
 
-  void _forSubmitted() {
+  void _forSubmitted() async{
     final form = _formKey.currentState;
     if (form.validate() && _verifyCode != '') {
       form.save();
@@ -128,9 +125,8 @@ class fogetpwdPageState extends State<fogetpwdPage> {
         "password": _password,
         "code": _verifyCode
       };
-      print(params);
-      HttpUtils.apipost(context, "Public/resetPasswrod", params, (response) async{
-        print(response);
+
+     await HttpUtils.apipost(context, "Public/resetPasswrod", params, (response) async{
         await  DialogUtils.showToastDialog(context, response['message']);
         if (response['error_code'] == '1') Navigator.pop(context, "1");
 //        关闭当前页面并返回添加成功通知

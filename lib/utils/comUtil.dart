@@ -172,9 +172,7 @@ class ComFunUtil {
             bottom:
                 BorderSide(width: 0.0, color: CupertinoColors.inactiveGray)),
       ),
-      onChanged: (str) {
-        return changfun(str) ?? null;
-      },
+      onChanged: changfun ?? null,
     );
 
     Widget adrformInput = TextFormField(

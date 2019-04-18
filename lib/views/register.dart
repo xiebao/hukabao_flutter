@@ -80,22 +80,18 @@ class registerState extends State<register> {
 
   void _getsmsCode() async {
     _phoneNo= _phoneNoCtrl.text.trim();
-    if(_phoneNo.isEmpty ||  !ComFunUtil.isChinaPhoneLegal(_phoneNo) ){
+    if(_phoneNo==null ||_phoneNo=='' ||  !ComFunUtil.isChinaPhoneLegal(_phoneNo) ){
       DialogUtils.showToastDialog(context,  '手机号必须填写');
       return;
     }
-
 
       Map<String, String> params = {
         "phone": _phoneNo,
         "type": '1',
       };
 
-      print("---Public/smsSend---");
-      print(params);
       await HttpUtils.apipost(context, "Public/smsSend", params, (response) async{
-        print(response);
-         if (response['error_code'] == '1') {
+        if (response['error_code'] == '1') {
           setState(() {
             _startTimer();
           });
@@ -141,10 +137,8 @@ class registerState extends State<register> {
         "inviteCode": _inviteCode,
         "code": _verifyCode
       };
-      print(params);
       await HttpUtils.apipost(context, "Public/register", params, (response) async{
        await DialogUtils.showToastDialog(context, response['message']);
-        print(response);
         String erd= response['error_code'].toString() ?? '0';
         if ( erd== '1')
            Application.run(context, "/login");
