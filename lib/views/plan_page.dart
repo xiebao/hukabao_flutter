@@ -90,38 +90,44 @@ class planPageState extends State<planPage> {
     }
 
     _isplanreg = true;
-
     if (_cardsList[_indexcard].planBanged != '1') {
+      setState(() {
+        _isplanreg = false;
+      });
+
       await DialogUtils()
           .showMyDialog(context, '卡片未激活注册计划，是否现在激活?')
           .then((rv) async {
         if (rv) {
           Map<String, String> params = {
             "cardId": _curCardId,
+            "channel":_cardsList[_indexcard].planChannel
           };
 
           await HttpUtils.apipost(context, "Index/extcardAddFirst", params,
               (response) async {
             await DialogUtils.showToastDialog(context, response['message']);
-            if (response['error_code'] == '1') {
+            if (response['error_code'].toString() == '1') {
               _orderNo = response['data']['orderNo'];
               _smsSeq = response['data']['smsSeq'];
-
-              await showCardRegDialog().then((v) async {
-                if (v != null && v != '') {
-                  List<String> msg = v.split(",");
+              var v = await showCardRegDialog();
+              if (v != null && v != '') {
+                List<String> msg = v.split(",");
+                if(  msg[0] == '1'){
                   setState(() {
-                    _isplanreg = (msg[0] == '1' ? true : false);
+                    _cardsList[_indexcard].planBanged="1";
+                    _isplanreg = true ;
                   });
                 }
-              });
+
+              }
             }
           });
         }
       });
-      if (_isplanreg) await _submit();
-    } else
-      await _submit();
+    }
+    if (_isplanreg) await _submit();
+
   }
 
   void _submit() async {
@@ -211,10 +217,9 @@ class planPageState extends State<planPage> {
             (response) async {
 //          print(response['data']['info']);
           hideLoadingDialog();
-          if (response['error_code'] != "-1") {
+          if (response['error_code'] == "1") {
             _planViewList = List();
             response['data']['planList'].forEach((ele) {
-//              print("${ele['card_id']}|${ele['plan_money']}|${ele['plan_bond']}|${ele['plan_time']}|${ele['plan_test']}");
               _planViewList.add(PlanViewCell.fromJson(ele));
             });
             setState(() {
@@ -257,89 +262,88 @@ class planPageState extends State<planPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("计划管理"),
-        ),
-        body: Center(
-          child: _cardsList.isEmpty
-              ? Text("没有发现卡片")
-              : new ListView(
-                  children: <Widget>[
-                    new Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10.0),
-                        ),
+      appBar: AppBar(
+        title: Text("计划管理"),
+      ),
+      body: Center(
+        child: _cardsList.isEmpty
+            ? Text("没有发现卡片")
+            : new ListView(
+                children: <Widget>[
+                  new Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10.0),
                       ),
-                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                      width: MediaQuery.of(context).size.width,
-                      height: 220,
-                      child: Swiper(
+                    ),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                    width: MediaQuery.of(context).size.width,
+                    height: 220,
+                    child: Swiper(
 //                      controller: _swiperController,
-                        itemBuilder: (BuildContext context, int index) {
-                          return CardDataItem(
-                              page: Page(label: '信用卡'),
-                              data: _cardsList[index]);
-                        },
-                        itemCount: _cardsList.length, // _picList.length,
-                        scale: 0.5,
+                      itemBuilder: (BuildContext context, int index) {
+                        return CardDataItem(
+                            page: Page(label: '信用卡'), data: _cardsList[index]);
+                      },
+                      itemCount: _cardsList.length, // _picList.length,
+                      scale: 0.5,
 //                      layout:SwiperLayout.STACK,
 //                      pagination: new SwiperPagination(),
-                        pagination: SwiperPagination(
-                            alignment: Alignment.bottomCenter,
-                            margin: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-                            builder: DotSwiperPaginationBuilder(
-                                color: Colors.white,
-                                activeColor: Colors.black54)),
+                      pagination: SwiperPagination(
+                          alignment: Alignment.bottomCenter,
+                          margin: const EdgeInsets.fromLTRB(0, 0, 10, 10),
+                          builder: DotSwiperPaginationBuilder(
+                              color: Colors.white,
+                              activeColor: Colors.black54)),
 
-                        onTap: _itemselected,
-                        onIndexChanged: _itemselected,
-                      ),
+                      onTap: _itemselected,
+                      onIndexChanged: _itemselected,
                     ),
-                    new Container(
-                      padding: new EdgeInsets.all(20.0),
-                      child: SafeArea(
-                        child: Form(
-                            //绑定状态属性
-                            key: _formKey,
-                            autovalidate: true,
-                            child: SingleChildScrollView(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    _buildAmountText(),
-                                    const SizedBox(height: 5.0),
-                                    _buildBandText(),
-                                    const SizedBox(height: 5.0),
-                                    _buidPlanDaysRow(),
-                                    const SizedBox(height: 30.0),
-                                    Container(
-                                      width: 300.0,
-                                      child: FlatButton(
-                                        disabledColor: Colors.grey,
-                                        color: GlobalConfig.mainColor,
-                                        child: Padding(
-                                          padding: EdgeInsets.all(10.0),
-                                          child: Text(
-                                            '计划预览',
-                                            style: new TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16.0),
-                                          ),
+                  ),
+                  new Container(
+                    padding: new EdgeInsets.all(20.0),
+                    child: SafeArea(
+                      child: Form(
+                          //绑定状态属性
+                          key: _formKey,
+                          autovalidate: true,
+                          child: SingleChildScrollView(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  _buildAmountText(),
+                                  const SizedBox(height: 5.0),
+                                  _buildBandText(),
+                                  const SizedBox(height: 5.0),
+                                  _buidPlanDaysRow(),
+                                  const SizedBox(height: 30.0),
+                                  Container(
+                                    width: 300.0,
+                                    child: FlatButton(
+                                      disabledColor: Colors.grey,
+                                      color: GlobalConfig.mainColor,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(10.0),
+                                        child: Text(
+                                          '计划预览',
+                                          style: new TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16.0),
                                         ),
-                                        onPressed:
-                                            _isplanreg ? _submitPlan : null,
                                       ),
+                                      onPressed:
+                                          _isplanreg ? _submitPlan : null,
                                     ),
-                                  ],
-                                ))),
-                      ),
+                                  ),
+                                ],
+                              ))),
                     ),
-                  ],
-                ),
-        ));
+                  ),
+                ],
+              ),
+      ),
+    );
   }
 
   Widget _buildAmountText() {
@@ -447,20 +451,23 @@ class planPageState extends State<planPage> {
             context: context,
             barrierDismissible: false,
             builder: (context) => new AlertDialog(
-                    title: new Text("计划卡片激活注册"),
+                    title: new Text("卡片激活"),
                     contentPadding: EdgeInsets.all(10.0),
                     content: Container(
-                      height: 30,
+                      height: 100,
+                      width: 80,
                       child: Column(
                         children: <Widget>[
-                          Text('激活码'),
                           TextField(
                             controller: _regCodeCtrl,
                             cursorColor: GlobalConfig.mainColor,
                             maxLength: 6,
-                            keyboardType: TextInputType.phone,
+                            keyboardType: TextInputType.number,
                             decoration: new InputDecoration(
+                              border: OutlineInputBorder(),
                               hintText: '请输入激活码',
+                              labelText: '验证码',
+                              prefixIcon: Icon(Icons.local_offer),
                               contentPadding: EdgeInsets.all(10.0),
                             ),
                           )
@@ -484,6 +491,7 @@ class planPageState extends State<planPage> {
   void cardreg() async {
     if (_regCodeCtrl.text != '') {
       Map<String, String> params = {
+        "channel":_cardsList[_indexcard].planChannel,
         "cardId": _curCardId,
         "orderNo": _orderNo,
         "smsSeq": _smsSeq,
@@ -493,8 +501,9 @@ class planPageState extends State<planPage> {
         _regclk = true;
       });
 
-      await HttpUtils.apipost(context, "Index/extcardAdd", params, (response) async{
-        await DialogUtils.showToastDialog(context,response['message']);
+      await HttpUtils.apipost(context, "Index/extcardAdd", params,
+          (response) async {
+        await DialogUtils.showToastDialog(context, response['message']);
         Navigator.of(context)
             .pop("${response['error_code']},${response['message']}");
       });

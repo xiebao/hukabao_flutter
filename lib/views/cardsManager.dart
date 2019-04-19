@@ -4,7 +4,8 @@ import '../model/book_cell.dart';
 import '../utils/HttpUtils.dart';
 import '../utils/DialogUtils.dart';
 import '../components/bankCardBuider.dart';
-import '../views/addCard.dart';
+import 'addCard.dart';
+import 'editCard.dart';
 import '../globleConfig.dart';
 
 class cardLists extends StatefulWidget {
@@ -25,6 +26,8 @@ class TabBarDemoState extends State<cardLists>
   List<BookCell> _cardsList2 = List();
   String _curType = "1";
   String _curCardId = '';
+  BookCell _curCard = BookCell();
+
   String _userName;
   String _userIdNo;
   TabController _tabController;
@@ -70,10 +73,10 @@ class TabBarDemoState extends State<cardLists>
 
   // 返回每个隐藏的菜单项
   _SelectView(IconData icon, String text, String id) {
-    return new PopupMenuItem<String>(
+    return PopupMenuItem<String>(
         value: id,
         child: Container(
-          child: new Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               new Icon(icon, color: GlobalConfig.mainColor),
@@ -111,76 +114,44 @@ class TabBarDemoState extends State<cardLists>
               ),
             ],
             controller: _tabController,
+            onTap: (index){
+                setState(() {
+                  _curType=(index + 1).toString() ?? '1';
+                });
+            },
+
           ),
 
           actions: <Widget>[
             // 隐藏的菜单
             new PopupMenuButton<String>(
-              itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-                    _SelectView(Icons.favorite, '设为默认', 'A'),
-                    _SelectView(Icons.delete, '删除', 'B'),
-//                    _SelectView(Icons.ac_unit, '隐藏测试', 'C'),
-                  ],
+              itemBuilder: (BuildContext context) => _curType == '1'
+                  ? <PopupMenuEntry<String>>[
+                      _SelectView(Icons.favorite, '设为默认', 'A'),
+                      PopupMenuDivider(height: 1.0),
+                      _SelectView(Icons.delete, '删除', 'B'),
+                      PopupMenuDivider(height: 1.0),
+                      _SelectView(Icons.edit, '修改', 'C'),
+                    ]
+                  : <PopupMenuEntry<String>>[
+                      PopupMenuDivider(height: 1.0),
+                      _SelectView(Icons.delete, '删除', 'B'),
+                      PopupMenuDivider(height: 1.0),
+                      _SelectView(Icons.edit, '修改', 'C'),
+                    ],
               onSelected: (String action) {
                 // 点击选项的时候
                 print(action);
+
                 switch (action) {
                   case 'A':
-                    if (_curCardId != '' && _curType == '1') {
-                      Map<String, String> params = {
-                        "cardId": _curCardId,
-                      };
-                      HttpUtils.apipost(context, 'User/setDefaultcard', params,
-                          (response){
-                        print(
-                            '=================setDefaultcard======================');
-
-                        String ercd = response['error_code'].toString() ?? '0';
-                        if (ercd == '1') {
-                          setState(() {
-                            _defalutId = _curCardId;
-                          });
-                        }
-                        DialogUtils.showToastDialog(context, response['message']);
-                      });
-                    } else
-                      DialogUtils.showToastDialog(context, "请长按选择储蓄卡卡片");
-
+                    setdefault();
                     break;
                   case 'B':
-                    if (_curCardId != '') {
-                      Map<String, String> params = {
-                        "cardId": _curCardId,
-                      };
-                      setState(() {
-                        _deleteIds.add(_curCardId);
-                      });
-                      HttpUtils.apipost(context, 'User/cardDelete', params,
-                          (response) {
-                        print(
-                            '=================cardDelete======================');
-                        String ercd = response['error_code'].toString() ?? '0';
-                         if (ercd != '1') {
-                          setState(() {
-                            _deleteIds.removeLast();
-                          });
-                        }
-                        DialogUtils.showToastDialog(context,  response['message']);
-
-                          });
-                    } else
-                      DialogUtils.showToastDialog(context, "请长按卡片选择");
-
+                    deletitem();
                     break;
                   case 'C':
-                    if (_curCardId != '') {
-                      DialogUtils.showToastDialog(context, "隐藏测试$_curCardId");
-                      setState(() {
-                        _deleteIds.add(_curCardId);
-                      });
-                    } else
-                      DialogUtils.showToastDialog(context,  "请长按卡片选择");
-
+                    edititem();
                     break;
                 }
               },
@@ -238,7 +209,7 @@ class TabBarDemoState extends State<cardLists>
               context,
               MaterialPageRoute(
                 builder: (context) => addCard(
-                    cardType: (cdtp + 1).toString()?? '1',
+                    cardType: (cdtp + 1).toString() ?? '1',
                     userName: _userName,
                     UserIdNo: _userIdNo),
               ),
@@ -260,10 +231,10 @@ class TabBarDemoState extends State<cardLists>
   Widget _cardShow(Page page, BookCell data) {
     return _deleteIds.indexOf(data.id) < 0
         ? InkWell(
-            onLongPress: () {
-              print('Selectable card state changed');
+            onLongPress:() {
               setState(() {
                 _curCardId = data.id;
+                _curCard = data;
                 _curType = page.id == '储' ? "1" : "2";
                 print(_curCardId + "-" + _curType);
               });
@@ -280,7 +251,7 @@ class TabBarDemoState extends State<cardLists>
                             ? Theme.of(context)
                                 .colorScheme
                                 .primary
-                                .withAlpha(41)
+                                .withAlpha(88)
                             : Colors.transparent,
                         child: CardDataItem(
                           page: page,
@@ -311,14 +282,89 @@ class TabBarDemoState extends State<cardLists>
                                 value: data.id,
                                 groupValue: _curCardId,
                                 onChanged: (v) {
-                                  print(v);
                                   setState(() {
-                                    _curCardId = v;
+                                    _curCardId = data.id;
+                                    _curCard = data;
+                                    _curType = page.id == '储' ? "1" : "2";
+                                    print(_curCardId + "-" + _curType);
                                   });
+
                                 }),
                           )),
               ],
             ))
         : const SizedBox(height: 2.0);
+  }
+
+  void setdefault() async {
+    if(_tabController.index==1){
+       setState(() {
+        _curType = '2';
+      });
+      await DialogUtils.showToastDialog(context, "不支持默认信用卡设置");
+      return;
+    }
+    if (_curCardId != '' && _curType == '1') {
+      Map<String, String> params = {
+        "cardId": _curCardId,
+      };
+      await HttpUtils.apipost(context, 'User/setDefaultcard', params,
+          (response) async {
+        String ercd = response['error_code'].toString() ?? '0';
+        if (ercd == '1') {
+          setState(() {
+            _defalutId = _curCardId;
+          });
+        }
+        await DialogUtils.showToastDialog(context, response['message']);
+      });
+    } else {
+      if (_curType != '1')
+        await DialogUtils.showToastDialog(context, "不支持默认信用卡设置");
+      else
+        await DialogUtils.showToastDialog(context, "请长按选择储蓄卡卡片");
+    }
+  }
+
+  void deletitem() async {
+    if (_curCardId != '') {
+      Map<String, String> params = {
+        "cardId": _curCardId,
+      };
+      setState(() {
+        _deleteIds.add(_curCardId);
+      });
+      await HttpUtils.apipost(context, 'User/cardDelete', params,
+          (response) async {
+        print('=================cardDelete======================');
+        String ercd = response['error_code'].toString() ?? '0';
+        if (ercd != '1') {
+          setState(() {
+            _deleteIds.removeLast();
+          });
+        }
+        await DialogUtils.showToastDialog(context, response['message']);
+      });
+    } else
+      await DialogUtils.showToastDialog(context, "请长按卡片选择");
+  }
+
+  void edititem() async {
+    if (_curCardId != '' && _curCard.id != '') {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => editCard(_curCard),
+        ),
+      ).then((result) {
+        if (result == '1') {
+          _mounted = false;
+          _cardsList1 = List();
+          _cardsList2 = List();
+          _loadData();
+        }
+      });
+    } else
+      await DialogUtils.showToastDialog(context, "请长按卡片选择");
   }
 }

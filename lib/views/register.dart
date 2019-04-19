@@ -179,19 +179,13 @@ class registerState extends State<register> {
         if (value.isEmpty || value.trim().length < 6) {
           return '密码过短';
         }
-        setState(() {
-          _password = value;
-        });
+         _password = value;
       },
       onFieldSubmitted: (String value) {
-        setState(() {
-          _password = value;
-        });
+        _password = value;
       },
       onSaved: (String value) {
-        setState(() {
-          _password = value;
-        });
+        _password = value;
       },
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 12.0),

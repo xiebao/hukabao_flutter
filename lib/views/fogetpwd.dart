@@ -14,6 +14,8 @@ class fogetpwdPage extends StatefulWidget {
 class fogetpwdPageState extends State<fogetpwdPage> {
   GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   TextEditingController _phoneNoCtrl = TextEditingController();
+  TextEditingController _verifyCodeCtrl = TextEditingController();
+
 
   String _phoneNo;
   String _password = '';
@@ -96,13 +98,14 @@ class fogetpwdPageState extends State<fogetpwdPage> {
         _cancelTimer();
         return;
       }
-
+      setState(() {
       _seconds--;
       _verifyStr = '$_seconds(s)';
-      setState(() {});
-      if (_seconds == 0) {
-        _verifyStr = '重新发送';
-      }
+        if (_seconds == 0) {
+          _verifyStr = '重新发送';
+        }
+      });
+
     });
   }
 
@@ -118,19 +121,32 @@ class fogetpwdPageState extends State<fogetpwdPage> {
 
   void _forSubmitted() async{
     final form = _formKey.currentState;
-    if (form.validate() && _verifyCode != '') {
+    _verifyCode=_verifyCodeCtrl.text;
+    print(_verifyCode);
+    if (_phoneNo!='' && _password!='' && _verifyCode != '') {
       form.save();
       Map<String, String> params = {
         "phone": _phoneNo,
         "password": _password,
         "code": _verifyCode
       };
-
-     await HttpUtils.apipost(context, "Public/resetPasswrod", params, (response) async{
-        await  DialogUtils.showToastDialog(context, response['message']);
-        if (response['error_code'] == '1') Navigator.pop(context, "1");
-//        关闭当前页面并返回添加成功通知
+      var checkvd=false;
+      await HttpUtils.apipost(context, "Public/findPasswrod", params, (response) async{
+        if (response['error_code'] == '1')
+          checkvd=true;
+        else
+          await  DialogUtils.showToastDialog(context, response['message']);
       });
+
+      if(checkvd){
+        await HttpUtils.apipost(context, "Public/resetPasswrod", params, (response) async{
+
+          await  DialogUtils.showToastDialog(context, response['message']);
+          if (response['error_code'] == '1') Navigator.pop(context, "1");
+//        关闭当前页面并返回添加成功通知
+        });
+      }
+
     }
   }
 
@@ -152,16 +168,16 @@ class fogetpwdPageState extends State<fogetpwdPage> {
           _password = value;
         });
       },
+
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
         filled: true,
         hintText: "请输入密码",
-        helperText: "请输入至少6位密码",
+        helperText: "请输入密码",
         icon: Icon(Icons.lock) ,
         fillColor: Colors.white,
         errorStyle: TextStyle(fontSize: 8),
         suffixIcon: GestureDetector(
-//          dragStartBehavior: DragStartBehavior.down,
           onTap: () {
             setState(() {
               _obscureText = !_obscureText;
@@ -216,6 +232,7 @@ class fogetpwdPageState extends State<fogetpwdPage> {
   Widget _buildVerifyCodeEdit() {
     var node = new FocusNode();
     Widget verifyCodeEdit = new TextFormField(
+      controller: _verifyCodeCtrl,
 //      autovalidate: true,
        decoration: new InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -226,7 +243,7 @@ class fogetpwdPageState extends State<fogetpwdPage> {
         errorStyle: TextStyle(fontSize: 8),
       ),
       maxLines: 1,
-      maxLength: 6,
+      maxLength: 4,
       //键盘展示为数字
       keyboardType: TextInputType.number,
       //只能输入数字

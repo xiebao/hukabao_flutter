@@ -26,6 +26,9 @@ class BookCell {
   String planChannel; //
   String singleQuota; //
   String dayQuota; //
+  String cityid;
+  String citycode;
+  String cityname;
 
   BookCell(
       {this.id,
@@ -45,6 +48,10 @@ class BookCell {
       this.planChannel,
         this.singleQuota,
         this.dayQuota,
+        this.cityid,
+        this.citycode,
+        this.cityname,
+
       this.dfault});
 
   factory BookCell.fromJson(Map<String, dynamic> json) {
@@ -66,6 +73,9 @@ class BookCell {
         bankRepayDate: json['bankRepayDate']??'',
         dayQuota: json['day_quota'].toString()??"未知",
         singleQuota: json['single_quota'].toString()??"未知",
+        cityid: json['regionid'].toString()??"2",
+        citycode: json['regioncode'].toString()??"110000",
+        cityname: json['regionname'].toString()??"北京",
         dfault: json['default']??'0');
   }
 

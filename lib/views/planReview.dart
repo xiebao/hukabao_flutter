@@ -132,4 +132,11 @@ bool _setok=false;
           onPressed: _planConfirm,
         ));
   }
+
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
 }

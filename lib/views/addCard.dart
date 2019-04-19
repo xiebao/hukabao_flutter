@@ -378,7 +378,7 @@ class addCardState extends State<addCard> {
     Result result = await CityPickers.showCityPicker(
       context: context,
     );
-    print(result);
+    print(result.cityId);
     setState(() {
       _regionCode = result.cityId;
       _region = result.cityName;
