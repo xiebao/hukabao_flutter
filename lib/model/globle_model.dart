@@ -1,10 +1,9 @@
+import 'dart:core';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'userinfo.dart';
-import 'dart:core';
 
 class globleModel extends Model {
-
   bool _loginStatus = false;
   String _token = '';
   Userinfo _userinfo;
@@ -26,10 +25,10 @@ class globleModel extends Model {
   }
 
   Future setToken(String token) async {
-    SharedPreferences sp = await _prefs;
-    await sp.setString("token", token);
+    SharedPreferences prefs = await _prefs;
+    await prefs.setString("token", token);
     print("++++++++setlogin:$token ++++");
-    print("===SharedPreferences getString :${sp.getString("token")}---");
+    print("===SharedPreferences getString :${prefs.getString("token")}---");
     _token = token;
     _loginStatus = true;
 

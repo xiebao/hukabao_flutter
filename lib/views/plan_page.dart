@@ -84,11 +84,10 @@ class planPageState extends State<planPage> {
     else
       return;
 
-    if (_curCardId.isEmpty){
+    if (_curCardId.isEmpty) {
       DialogUtils.showToastDialog(context, "请选择卡片");
       return;
     }
-
 
     _isplanreg = true;
 
@@ -100,27 +99,23 @@ class planPageState extends State<planPage> {
           Map<String, String> params = {
             "cardId": _curCardId,
           };
-          print("----_getsmsCode---");
+
           await HttpUtils.apipost(context, "Index/extcardAddFirst", params,
-              (response) async{
-            print(response);
-             if (response['error_code'] == '1') {
+              (response) async {
+            await DialogUtils.showToastDialog(context, response['message']);
+            if (response['error_code'] == '1') {
               _orderNo = response['data']['orderNo'];
               _smsSeq = response['data']['smsSeq'];
+
+              await showCardRegDialog().then((v) async {
+                if (v != null && v != '') {
+                  List<String> msg = v.split(",");
+                  setState(() {
+                    _isplanreg = (msg[0] == '1' ? true : false);
+                  });
+                }
+              });
             }
-            await DialogUtils.showToastDialog(context, response['message']);
-
-              }).then((_) {
-            showCardRegDialog().then((v) async{
-              if (v != null && v != '') {
-                List<String> msg = v.split(",");
-                setState(() {
-                  _isplanreg = (msg[0] == '1' ? true : false);
-                });
-
-               await DialogUtils.showToastDialog(context, msg[1]);
-              }
-            });
           });
         }
       });
@@ -131,8 +126,8 @@ class planPageState extends State<planPage> {
 
   void _submit() async {
     try {
-      String billday= _cardsList[_indexcard].bankBill;
-      String endpayday=_cardsList[_indexcard].bankRepayDate;
+      String billday = _cardsList[_indexcard].bankBill;
+      String endpayday = _cardsList[_indexcard].bankRepayDate;
 
       DateTime nowTime = DateTime.now();
       DateTime time1 = DateTime.parse(_startDayCtroller.text.trim());
@@ -140,60 +135,64 @@ class planPageState extends State<planPage> {
       print(_startDayCtroller.text);
       print(_endDayCtroller.text);
 
-      DateTime nowtimeflg=DateTime.parse("${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${nowTime.day.toString().padLeft(2, '0')}");
+      DateTime nowtimeflg = DateTime.parse(
+          "${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${nowTime.day.toString().padLeft(2, '0')}");
       if (time1.isBefore(nowtimeflg)) {
-          await  DialogUtils.showToastDialog(context,  "开始日期至少从今天开始");
-          return;
+        await DialogUtils.showToastDialog(context, "开始日期至少从今天开始");
+        return;
       }
 
       if (time1.isBefore(time2)) {
         Duration duration = time2.difference(time1);
         if (duration.inDays <= 2) {
-        await  DialogUtils.showToastDialog(context,  "结束日期要在开始日期至少2日后");
+          await DialogUtils.showToastDialog(context, "结束日期要在开始日期至少2日后");
           return;
         }
       } else {
-       await DialogUtils.showToastDialog(context,  "开始日期必须早于结束日期");
+        await DialogUtils.showToastDialog(context, "开始日期必须早于结束日期");
         return;
       }
 
       print(time2.difference(time1).inDays);
 
-     DateTime billdaytimeflg= DateTime.now();
-     if(nowTime.day<int.parse(billday))
-           billdaytimeflg=DateTime.parse("${nowTime.year.toString()}-${(nowTime.month-1).toString().padLeft(2, '0')}-${billday.padLeft(2, '0')}");
-     else
-        billdaytimeflg=DateTime.parse("${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${billday.padLeft(2, '0')}");
-
-     if (time1.isBefore(billdaytimeflg)) {
-        await DialogUtils.showToastDialog(context,  "开始日期必须在账单日之后");
-        return;
-      }
-
-      DateTime endpaydaytimeflg= DateTime.now();
-      if(nowTime.day>int.parse(endpayday))
-        endpaydaytimeflg=DateTime.parse("${nowTime.year.toString()}-${(nowTime.month+1).toString().padLeft(2, '0')}-${endpayday.padLeft(2, '0')}");
+      DateTime billdaytimeflg = DateTime.now();
+      if (nowTime.day < int.parse(billday))
+        billdaytimeflg = DateTime.parse(
+            "${nowTime.year.toString()}-${(nowTime.month - 1).toString().padLeft(2, '0')}-${billday.padLeft(2, '0')}");
       else
-        endpaydaytimeflg=DateTime.parse("${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${endpayday.padLeft(2, '0')}");
-      if (time1.isAfter(endpaydaytimeflg)) {
-        await DialogUtils.showToastDialog(context,  "结束日期必须在还款日之前");
+        billdaytimeflg = DateTime.parse(
+            "${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${billday.padLeft(2, '0')}");
+
+      if (time1.isBefore(billdaytimeflg)) {
+        await DialogUtils.showToastDialog(context, "开始日期必须在账单日之后");
         return;
       }
 
+      DateTime endpaydaytimeflg = DateTime.now();
+      if (nowTime.day > int.parse(endpayday))
+        endpaydaytimeflg = DateTime.parse(
+            "${nowTime.year.toString()}-${(nowTime.month + 1).toString().padLeft(2, '0')}-${endpayday.padLeft(2, '0')}");
+      else
+        endpaydaytimeflg = DateTime.parse(
+            "${nowTime.year.toString()}-${nowTime.month.toString().padLeft(2, '0')}-${endpayday.padLeft(2, '0')}");
+      if (time1.isAfter(endpaydaytimeflg)) {
+        await DialogUtils.showToastDialog(context, "结束日期必须在还款日之前");
+        return;
+      }
     } catch (e) {
       print(e.toString());
-      await DialogUtils.showToastDialog(context,  "日期格式错误");
+      await DialogUtils.showToastDialog(context, "日期格式错误");
       return;
     }
 
     final form = _formKey.currentState;
     if (form.validate()) {
-      if(int.parse(_amountCtroller.text)<500){
-        await DialogUtils.showToastDialog(context,  "计划金额必须不少于500元");
+      if (int.parse(_amountCtroller.text) < 500) {
+        await DialogUtils.showToastDialog(context, "计划金额必须不少于500元");
         return;
       }
-      if(int.parse(_bandCtroller.text)<100){
-        await DialogUtils.showToastDialog(context,  "保证金金额必须大于100元");
+      if (int.parse(_bandCtroller.text) < 100) {
+        await DialogUtils.showToastDialog(context, "保证金金额必须大于100元");
         return;
       }
 
@@ -209,11 +208,11 @@ class planPageState extends State<planPage> {
       try {
         showLoadingDialog();
         await HttpUtils.apipost(context, 'Order/planAddOther', params,
-            (response) async{
+            (response) async {
 //          print(response['data']['info']);
           hideLoadingDialog();
           if (response['error_code'] != "-1") {
-            _planViewList=List();
+            _planViewList = List();
             response['data']['planList'].forEach((ele) {
 //              print("${ele['card_id']}|${ele['plan_money']}|${ele['plan_bond']}|${ele['plan_time']}|${ele['plan_test']}");
               _planViewList.add(PlanViewCell.fromJson(ele));
@@ -235,11 +234,11 @@ class planPageState extends State<planPage> {
               ),
             );
           } else
-           await DialogUtils.showToastDialog(context,  response['message']);
+            await DialogUtils.showToastDialog(context, response['message']);
         });
       } catch (e) {
         print(e);
-       await DialogUtils.showToastDialog(context, '网络连接错误');
+        await DialogUtils.showToastDialog(context, '网络连接错误');
       }
     }
   }
@@ -403,15 +402,18 @@ class planPageState extends State<planPage> {
           });
         });
       },
-      child: ComFunUtil().buideStandInput(context, '开始日', _startDayCtroller,
-          showPlaceholder: false,
-          valfun: (value) {
-            if (value.isEmpty) {
-              return '';
-            }
-          },
-          tapfun: true,
-         ),
+      child: ComFunUtil().buideStandInput(
+        context,
+        '开始日',
+        _startDayCtroller,
+        showPlaceholder: false,
+        valfun: (value) {
+          if (value.isEmpty) {
+            return '';
+          }
+        },
+        tapfun: true,
+      ),
     );
   }
 
@@ -425,15 +427,18 @@ class planPageState extends State<planPage> {
           });
         });
       },
-      child: ComFunUtil().buideStandInput(context, '结束日', _endDayCtroller,
-          showPlaceholder: false,
-          valfun: (value) {
-            if (value.isEmpty) {
-              return '';
-            }
-          },
-          tapfun: true,
-        ),
+      child: ComFunUtil().buideStandInput(
+        context,
+        '结束日',
+        _endDayCtroller,
+        showPlaceholder: false,
+        valfun: (value) {
+          if (value.isEmpty) {
+            return '';
+          }
+        },
+        tapfun: true,
+      ),
     );
   }
 
@@ -471,28 +476,28 @@ class planPageState extends State<planPage> {
                       ),
                       new FlatButton(
                           child: _regclk == true ? Text('验证中…') : Text("确定"),
-                          onPressed: () {
-                            if (_regCodeCtrl.text != '') {
-                              Map<String, String> params = {
-                                "cardId": _curCardId,
-                                "orderNo": _orderNo,
-                                "smsSeq": _smsSeq,
-                                "phoneCode": _regCodeCtrl.text.trim()
-                              };
-                              setState(() {
-                                _regclk = true;
-                              });
-
-                              HttpUtils.apipost(
-                                  context, "Index/extcardAdd", params,
-                                  (response) {
-                                print(response);
-                                Navigator.of(context).pop(
-                                    "${response['error_code']},${response['message']}");
-                              });
-                            }
-                          })
+                          onPressed: cardreg)
                     ])) ??
         '';
+  }
+
+  void cardreg() async {
+    if (_regCodeCtrl.text != '') {
+      Map<String, String> params = {
+        "cardId": _curCardId,
+        "orderNo": _orderNo,
+        "smsSeq": _smsSeq,
+        "phoneCode": _regCodeCtrl.text.trim()
+      };
+      setState(() {
+        _regclk = true;
+      });
+
+      await HttpUtils.apipost(context, "Index/extcardAdd", params, (response) async{
+        await DialogUtils.showToastDialog(context,response['message']);
+        Navigator.of(context)
+            .pop("${response['error_code']},${response['message']}");
+      });
+    }
   }
 }

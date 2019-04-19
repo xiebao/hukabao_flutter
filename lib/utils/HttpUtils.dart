@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:package_info/package_info.dart';
+import '../utils/updateApp.dart';
 import '../globleConfig.dart';
 import '../utils/DialogUtils.dart';
 import '../model/globle_model.dart';
@@ -89,10 +91,29 @@ class HttpUtils {
   static Future post(BuildContext context, String url, Function callBack,
       {Map<String, dynamic> params}) async {
     dio = createInstance();
+
+  if(url=="Public/Login"){
+      String ostype="android";
+      if (UpdateApp.defaultTargetPlatform == TargetPlatform.android) {
+        ostype="android";
+      } else if (UpdateApp.defaultTargetPlatform == Platform.isIOS) {
+        ostype="ios";
+      } else {
+        ostype="other";
+      }
+      var packageInfo = await PackageInfo.fromPlatform();
+      dio.options.headers = {
+        'version': packageInfo.version,
+        'os':ostype,
+        'from':"app"
+      };
+  }
+
+
     if (params == null || params.isEmpty) {
       params = {};
     }
-    print("- dio--request-ing-11111--");
+
     try {
       Response response = await dio.post(GlobalConfig.base + url,
           data: params,

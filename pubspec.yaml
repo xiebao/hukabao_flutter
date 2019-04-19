@@ -83,37 +83,9 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
 #  - assets/icon/icon.png
-  - images/logo.png
-  - images/sysicon/icon_wechat.png
-  - images/sysicon/icon_administer.png
-  - images/sysicon/icon_ann.png
-  - images/sysicon/icon_plan.png
-  - images/sysicon/icon_apply.png
-  - images/sysicon/icon_helpt.png
-  - images/sysicon/icon_jilu.png
-  - images/sysicon/icon_myimg.png
-  - images/sysicon/icon_order.png
-  - images/sysicon/icon_setup.png
-  - images/sysicon/icon_pingan.png
-
-  - images/sysicon/icon_card_s.png
-  - images/sysicon/icon_card_n.png
-  - images/sysicon/icon_home_n.png
-  - images/sysicon/icon_home_s.png
-  - images/sysicon/icon_my_s.png
-  - images/sysicon/icon_my_n.png
-
-  - images/bank/unionpay.png
-  - images/bank/icbc.png
-  - images/bank/psbc.png
-  - images/bank/abc.png
-  - images/bank/ccb.png
-  - images/bank/boc.png
-  - images/bank/cmb.png
-  - images/bank/null.png
-
-  #    - images/a_dot_burr.jpeg
-  #  - images/a_dot_ham.jpeg
+  - images/
+  - images/sysicon/
+  - images/bank/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
