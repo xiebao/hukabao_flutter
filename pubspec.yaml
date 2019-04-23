@@ -41,6 +41,7 @@ dependencies:
 
   #二维码扫描-用户激活-注意andriod和ios获取相机权限
   barcode_scan: ^1.0.0
+#  qrcode_reader: any
 #  image_picker: 0.4.12+1
 #  video_player: ^0.8.0
 

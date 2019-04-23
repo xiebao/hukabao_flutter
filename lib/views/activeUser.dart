@@ -6,6 +6,7 @@ import '../utils/HttpUtils.dart';
 import '../utils/DialogUtils.dart';
 import '../routers/application.dart';
 import '../model/globle_model.dart';
+//import 'package:qrcode_reader/qrcode_reader.dart';
 
 class activeUser extends StatefulWidget {
   @override
@@ -51,6 +52,13 @@ class activeUserState extends State<activeUser> {
 
   Future scan() async {
     print("-=-=-=-=-=-=-=-=-=--");
+/*    _qrcode =await QRCodeReader()
+        .setAutoFocusIntervalInMs(200) // default 5000
+        .setForceAutoFocus(true) // default false
+        .setTorchEnabled(true) // default false
+        .setHandlePermissions(true) // default true
+        .setExecuteAfterPermissionGranted(true) // default true
+        .scan();*/
     try {
       _qrcode = await BarcodeScanner.scan();
       print(_qrcode);
