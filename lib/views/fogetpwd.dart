@@ -122,9 +122,14 @@ class fogetpwdPageState extends State<fogetpwdPage> {
   void _forSubmitted() async{
     final form = _formKey.currentState;
     _verifyCode=_verifyCodeCtrl.text;
+    _phoneNo= _phoneNoCtrl.text.trim();
+
+    form.save();
     print(_verifyCode);
+    print(_phoneNo);
+    print(_password);
     if (_phoneNo!='' && _password!='' && _verifyCode != '') {
-      form.save();
+
       Map<String, String> params = {
         "phone": _phoneNo,
         "password": _password,
@@ -132,10 +137,16 @@ class fogetpwdPageState extends State<fogetpwdPage> {
       };
       var checkvd=false;
       await HttpUtils.apipost(context, "Public/findPasswrod", params, (response) async{
+        print(response);
         if (response['error_code'] == '1')
           checkvd=true;
         else
-          await  DialogUtils.showToastDialog(context, response['message']);
+          {
+            await  DialogUtils.showToastDialog(context, response['message']);
+            if (response['appfl_code'].toString() == '1')
+              Navigator.pop(context, "1");
+          }
+
       });
 
       if(checkvd){

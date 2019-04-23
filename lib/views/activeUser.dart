@@ -14,6 +14,7 @@ class activeUser extends StatefulWidget {
 
 class activeUserState extends State<activeUser> {
   bool _autovalidate = false;
+  String _qrcode="";
 
   final GlobalKey<FormState> _formKey1 = GlobalKey<FormState>();
 
@@ -24,14 +25,14 @@ class activeUserState extends State<activeUser> {
     final FormState form = _formKey1.currentState;
     if (form.validate()){
       form.save();
-      String codestr = _codeCtrl.text.trim();
-      if (codestr == '') return;
+      _qrcode = _codeCtrl.text.trim();
+      if (_qrcode == '') return;
       final model =globleModel().of(context);
       String token= model.token;
       if (token == '')
         DialogUtils.close2Logout(context);
 
-      List<String> coda = codestr.split(",");
+      List<String> coda = _qrcode.split(",");
       Map<String, String> params = {
         "cardno": coda[0], //10 位	卡号
         "code": coda[1], //32 位	激活码
@@ -49,24 +50,26 @@ class activeUserState extends State<activeUser> {
   }
 
   Future scan() async {
+    print("-=-=-=-=-=-=-=-=-=--");
     try {
-      String barcode = await BarcodeScanner.scan();
-      setState(() {
-         _codeCtrl.text = barcode;
-      });
-    } on PlatformException catch (e) {
+      _qrcode = await BarcodeScanner.scan();
+      print(_qrcode);
+    }
+    on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
-        await DialogUtils.showToastDialog(context,"请打开相机权限!");
+        setState(() {
+           _qrcode ="请打开相机权限!";
+        });
       } else {
-        await DialogUtils.showToastDialog(context, "位置错误: $e");
+        _qrcode= "位置错误: $e";
       }
     } on FormatException{
-      await DialogUtils.showToastDialog(context,"null (User returned using the  back -button before scanning anything. Result)");
+      _qrcode="null (User returned using the  back -button before scanning anything. Result)";
 
     } catch (e) {
-      await DialogUtils.showToastDialog(context,e);
-
+    _qrcode=e.toString();
     }
+    setState(() {_codeCtrl.text=_qrcode; });
   }
 
 

@@ -32,9 +32,10 @@ class SplashState extends State<SplashPage> {
   void _checkUpdateApp() async {
     await getNowVersion();
     SharedPreferences prefs = await _prefs;
+    String isupdate ='';//prefs.getString('update') ?? '';//暂时每次更新
 
-    String isupdate =prefs.getString('update') ?? '';
-    print("_checkUpdateApp---"+isupdate);
+    _isupdate=false;
+    prefs.remove('update');
     if (isupdate == '') {
       if (await UpdateApp().checkDownloadApp) {
         _isupdate = await DialogUtils().showMyDialog(context, '有更新版本，是否马上更新?');
@@ -65,8 +66,7 @@ class SplashState extends State<SplashPage> {
       }
     }
 
-    if (prefs.getString('update') == 'no') {
-      timer = Timer(const Duration(milliseconds: 1500), () async {
+     timer = Timer(const Duration(milliseconds: 1500), () async {
         String token = prefs.getString('token') ?? '';
         print("--spalshpage--prefs--------$token---------------");
         if (token == '')
@@ -85,7 +85,7 @@ class SplashState extends State<SplashPage> {
           });
         }
       });
-    }
+
   }
 
   @override

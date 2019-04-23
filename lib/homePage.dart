@@ -5,6 +5,7 @@ import './views/cardsManager.dart';
 import './views/index_page.dart';
 import './views/MyInfoPage.dart';
 import './model/index_model.dart';
+import './model/globle_model.dart';
 import './utils/HttpUtils.dart';
 
 class homePage extends StatefulWidget {
@@ -122,7 +123,7 @@ class homePageState extends State<homePage>
     Widget build (BuildContext context) {
       initData();
       return WillPopScope(
-        onWillPop: _doubleExit,//(){return Future.value(_onWillPop());},
+        onWillPop: (){_doubleExit(context);},//(){return Future.value(_onWillPop());},
         child:_login?
         Scaffold(
           body:  IndexedStack(
@@ -165,11 +166,11 @@ class homePageState extends State<homePage>
   }
 
   int _lastClickTime = 0;
-  Future<bool> _doubleExit() async{
+  Future<bool> _doubleExit(BuildContext context) async{
     int nowTime = new DateTime.now().microsecondsSinceEpoch;
     if (_lastClickTime != 0 && nowTime - _lastClickTime > 1500) {
        await _onWillPop().then((rv){
-         rv ? _exitApp(): new  Future.value(false);
+         rv ? _exitApp(context): new  Future.value(false);
       });
       return new Future.value(true);
     } else {
@@ -178,14 +179,16 @@ class homePageState extends State<homePage>
         _lastClickTime = 0;
       });
        await _onWillPop().then((rv){
-         rv ? _exitApp(): new Future.value(false);
+         rv ? _exitApp(context): new Future.value(false);
       });
       return new Future.value(true);
     }
   }
 
 
-  static Future<void> _exitApp() async {
+  static Future<void> _exitApp(BuildContext context) async {
+    final model = globleModel().of(context);
+     await model.setlogout();
     await SystemChannels.platform.invokeMethod('SystemNavigator.pop');
   }
 

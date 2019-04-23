@@ -164,7 +164,7 @@ class UpdateApp {
 
 //          if (await SimplePermissions.checkPermission(Permission.WriteExternalStorage)) {
         if(await checkPermission()){
-            if (newVersion.compareTo(packageInfo.version) > 0) {
+            if (newVersion.compareTo(packageInfo.buildNumber) > 0) {
               isupdate = true;
             }
           } else {

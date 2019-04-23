@@ -263,9 +263,9 @@ class TabBarDemoState extends State<cardLists>
                     alignment: Alignment.topRight,
                     child: data.cardType == '1' && _defalutId == data.id
                         ? Padding(
-                            padding: const EdgeInsets.only(right: 40, top: 25),
+                            padding: const EdgeInsets.only(right: 20, top: 25),
                             child: SizedBox(
-                                width: 50,
+                                width: 100,
                                 child: Row(
                                   children: <Widget>[
                                     Text('默认'),
@@ -273,7 +273,19 @@ class TabBarDemoState extends State<cardLists>
                                       Icons.favorite,
                                       size: 12,
                                       color: Colors.red[500],
-                                    )
+                                    ),
+                                    Radio(
+                                        value: data.id,
+                                        groupValue: _curCardId,
+                                        onChanged: (v) {
+                                          setState(() {
+                                            _curCardId = data.id;
+                                            _curCard = data;
+                                            _curType = page.id == '储' ? "1" : "2";
+                                            print(_curCardId + "-" + _curType);
+                                          });
+
+                                        })
                                   ],
                                 )))
                         : Padding(
