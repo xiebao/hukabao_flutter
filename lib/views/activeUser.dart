@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:barcode_scan/barcode_scan.dart';
+import 'package:qrcode_reader/qrcode_reader.dart';
 import '../utils/HttpUtils.dart';
 import '../utils/DialogUtils.dart';
 import '../routers/application.dart';
 import '../model/globle_model.dart';
-//import 'package:qrcode_reader/qrcode_reader.dart';
 
 class activeUser extends StatefulWidget {
   @override
@@ -52,25 +51,18 @@ class activeUserState extends State<activeUser> {
 
   Future scan() async {
     print("-=-=-=-=-=-=-=-=-=--");
-/*    _qrcode =await QRCodeReader()
-        .setAutoFocusIntervalInMs(200) // default 5000
+    try {
+          _qrcode =await QRCodeReader()
+       /* .setAutoFocusIntervalInMs(200) // default 5000
         .setForceAutoFocus(true) // default false
         .setTorchEnabled(true) // default false
         .setHandlePermissions(true) // default true
-        .setExecuteAfterPermissionGranted(true) // default true
-        .scan();*/
-    try {
-      _qrcode = await BarcodeScanner.scan();
+        .setExecuteAfterPermissionGranted(true) // default true*/
+        .scan();
       print(_qrcode);
     }
     on PlatformException catch (e) {
-      if (e.code == BarcodeScanner.CameraAccessDenied) {
-        setState(() {
-           _qrcode ="请打开相机权限!";
-        });
-      } else {
-        _qrcode= "位置错误: $e";
-      }
+        _qrcode= "相机权限错误: $e";
     } on FormatException{
       _qrcode="null (User returned using the  back -button before scanning anything. Result)";
 
@@ -109,7 +101,7 @@ class activeUserState extends State<activeUser> {
                             decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               hintText: '请输入激活码',
-                              helperText: '请输入激活码.',
+                              helperText: '输入激活码.',
                               labelText: '激活码',
                             ),
                             maxLines: 3,
