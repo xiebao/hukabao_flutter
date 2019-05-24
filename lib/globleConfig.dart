@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class GlobalConfig {
   static final String appName = '护卡宝';
+  static final String agentid='0';
   static final  bool dark = true;
 //  static ThemeData themeData = new ThemeData.dark();
   static final  Color mainColor = Colors.deepOrange;

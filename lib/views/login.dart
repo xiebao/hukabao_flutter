@@ -62,7 +62,7 @@ class LoginPageState extends State<LoginPage> {
           _wechaName = response['data']['nickname'];
           _unionId = response['data']['unionid'];
           _openid = response['data']['openid'];
-          _avatar = response['data']['avatar'];
+          _avatar = response['data']['headimgurl'];
           _wxuserInfo = response['data'];
 
           await _checkWxlogin(_unionId, response['data']['nickname']);
@@ -114,7 +114,7 @@ class LoginPageState extends State<LoginPage> {
       "unionid": _unionId,
       "openid": _openid,
       "nickname": _wechaName,
-      "avatar": _avatar,
+      "headimgurl": _avatar,
       "wxinfo": jsonEncode(_wxuserInfo),
     };
     try {

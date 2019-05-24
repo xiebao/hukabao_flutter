@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:qrcode_reader/qrcode_reader.dart';
+//import 'package:qrcode_reader/qrcode_reader.dart';
 import '../utils/HttpUtils.dart';
 import '../utils/DialogUtils.dart';
 import '../routers/application.dart';
@@ -52,13 +52,13 @@ class activeUserState extends State<activeUser> {
   Future scan() async {
     print("-=-=-=-=-=-=-=-=-=--");
     try {
-          _qrcode =await QRCodeReader()
-       /* .setAutoFocusIntervalInMs(200) // default 5000
-        .setForceAutoFocus(true) // default false
-        .setTorchEnabled(true) // default false
-        .setHandlePermissions(true) // default true
-        .setExecuteAfterPermissionGranted(true) // default true*/
-        .scan();
+      /*    _qrcode =await QRCodeReader()
+//       .setAutoFocusIntervalInMs(200) // default 5000
+//        .setForceAutoFocus(true) // default false
+//        .setTorchEnabled(true) // default false
+//        .setHandlePermissions(true) // default true
+//        .setExecuteAfterPermissionGranted(true) // default true
+        .scan();*/
       print(_qrcode);
     }
     on PlatformException catch (e) {

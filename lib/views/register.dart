@@ -134,8 +134,9 @@ class registerState extends State<register> {
       Map<String, String> params = {
         "phone": _phoneNo,
         "password": _password,
-        "inviteCode": _inviteCode,
-        "code": _verifyCode
+        "fromcode": _inviteCode,
+        "code": _verifyCode,
+        "agentid":GlobalConfig.agentid
       };
       await HttpUtils.apipost(context, "Public/register", params, (response) async{
        await DialogUtils.showToastDialog(context, response['message']);
@@ -238,7 +239,7 @@ class registerState extends State<register> {
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
         helperText: '选填',
-        hintText: "邀请码，选填",
+        hintText: "邀请码(邀请者手机号)，选填",
         filled: true,
         icon: Icon(Icons.camera_front) ,
         fillColor: Colors.white,

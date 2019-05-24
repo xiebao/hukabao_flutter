@@ -20,7 +20,8 @@ String _token;
   static const double IMAGE_ICON_WIDTH = 30.0;
   static const double ARROW_ICON_WIDTH = 16.0;
 
-  var titles = ["","VIP支付", "我的邀请码", "我的推荐", "我的收益", "关于我们","分享一下", "退出"];
+//  var titles = ["","VIP支付", "我的邀请码", "我的推荐", "我的收益", "关于我们","分享一下", "退出"];
+  var titles = ["","我的卡片", "我的计划订单", "我的付款记录", "关于我们","分享一下", "退出"];
   List icons = [
     Icons.all_inclusive,
     Icons.supervisor_account,
@@ -135,14 +136,11 @@ String _token;
 
   _handleListItemClick(int index) {
     switch (index) {
-      case 1:
+     /* case 1:
         Application.run(context, "/web",url: "${GlobalConfig.webbase}/WebPay/vipPay/token/",title: 'VIP支付');
         break;
       case 2:
-//        是一张图来的   String img_url = "${GlobalConfig.webbase}CreditCard/myqrCode/token/";
-//          Application.run(context, "/web",url: "${GlobalConfig.webbase}/CreditCard/myqrCode/token/",title: '我的邀请码');
           Application.router.navigateTo(context, "/share");
-
         break;
       case 3:
         Application.run(context, "/web",url: "${GlobalConfig.webbase}/CreditCard/shareProfit/token/",title: '我的推荐');
@@ -158,8 +156,25 @@ String _token;
         break;
       case 7:
         DialogUtils.close2Logout(context,cancel:true);
+        break;*/
+      case 1:
+        Application.router.navigateTo(context, "/cardadmin");
         break;
-
+      case 2:
+        Application.router.navigateTo(context, "/order");
+        break;
+      case 3:
+        Application.router.navigateTo(context, "/paylog");
+        break;
+      case 4:
+        Application.run(context, "/web",url: "${GlobalConfig.base}/Public/helpText",title: '联系我们',withToken: false);
+        break;
+      case 5:
+        Application.router.navigateTo(context, "/share");
+        break;
+      case 6:
+        DialogUtils.close2Logout(context,cancel:true);
+        break;
     }
   }
 

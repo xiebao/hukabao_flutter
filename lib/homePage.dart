@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import './views/cardsManager.dart';
 import './views/index_page.dart';
 import './views/MyInfoPage.dart';
@@ -121,11 +122,20 @@ class homePageState extends State<homePage>
 
     @override
     Widget build (BuildContext context) {
+      ///设置适配尺寸 (填入设计稿中设备的屏幕尺寸) 假如设计稿是按iPhone6的尺寸设计的(iPhone6 750*1334)
+      ///// 方式一：默认设置宽度1080px，高度1920px
+      //ScreenUtil.instance = ScreenUtil.getInstance()..init(context);      //
+      //// 方式二：设置宽度750px，高度1334px
+      //ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);      //
+      //// 方式三：设置宽度750px，高度1334px，根据系统字体进行缩放
+      //ScreenUtil.instance = ScreenUtil(width: 750, height: 1334, allowFontScaling: true)..init(context);
+      ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)..init(context);
       initData();
       return WillPopScope(
         onWillPop: (){_doubleExit(context);},//(){return Future.value(_onWillPop());},
         child:_login?
         Scaffold(
+          backgroundColor: Color.fromRGBO(244, 245, 245, 1.0),
           body:  IndexedStack(
             children: _pages,
             index: _tabIndex,

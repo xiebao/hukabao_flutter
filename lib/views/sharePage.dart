@@ -117,6 +117,8 @@ class sharePageState extends State<sharePage>
                 return  CachedNetworkImage(
                   placeholder: (context, url) => new CircularProgressIndicator(),
                   imageUrl: _picList[index].imgurl,
+//                  width:  MediaQuery.of(context).size.width,
+                  fit: BoxFit.fitHeight,
                 );
               /*  return Image.network(
                   _picList[index].imgurl,

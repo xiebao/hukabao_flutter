@@ -12,39 +12,45 @@ class SwipPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
+    return Container(
         padding: const EdgeInsets.all(0),
         width: MediaQuery.of(context).size.width,
+//        color: Colors.blue,
         height: 210,
         child: picList == null || picList == []
             ? Text('没有显示的')
-            : Swiper(
-                itemBuilder: (BuildContext context, int index) {
-                  return  CachedNetworkImage(
-                    placeholder: (context, url) =>Text('欢迎来到护卡宝'),// new CircularProgressIndicator(),
-                    imageUrl: picList[index].imgurl,
-                    width:  MediaQuery.of(context).size.width,
-                  );
-                },
-                loop: false,
-                itemCount: picList.length,
-                scale: 0.8,
-                pagination: SwiperPagination(
-                    alignment: Alignment.bottomCenter,
-                    margin: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-                    builder: DotSwiperPaginationBuilder(
-                        color: Colors.black54, activeColor: Colors.white)),
-                index: 0,
-                autoplay: false,
-                autoplayDisableOnInteraction: false,
-                onTap: (index) {
-                  if (picList[index].url.isNotEmpty) {
-                    Application.run(context, "/web",url: picList[index].url,title:picList[index].title ?? '护卡宝');
-                  }
-                },
-              ),
+            :
+        Swiper(
+        itemCount: picList.length,
+        itemBuilder: (BuildContext context, int index) {
+          return InkWell(
+            child:CachedNetworkImage(
+              placeholder: (context, url) =>CircularProgressIndicator(),// new Text('欢迎来到护卡宝'),
+              imageUrl: picList[index].imgurl,
+              width:  MediaQuery.of(context).size.width,
+              height: 200,
+              fit: BoxFit.fill,
+            ),
+            onTap: () {
+              if (picList[index].url.isNotEmpty) {
+                Application.run(context, "/web",url: picList[index].url,title:picList[index].title ?? '护卡宝');
+              }
+            },
+          );
+        },
+          pagination: SwiperPagination(
+              alignment: Alignment.bottomCenter,
+              margin: const EdgeInsets.fromLTRB(0, 0, 10, 10),
+              builder: DotSwiperPaginationBuilder(
+                  color: Colors.black54, activeColor: Colors.white)),
+
+          outer: false,
+          autoplay: true,
+//          loop: false,
+//          scale: 0.8,
+//        autoplayDisableOnInteraction: false,
       ),
+
     );
   }
 }

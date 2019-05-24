@@ -87,7 +87,7 @@ class orderListPageState extends State<orderListPage> {
                       ),
 //                    类型
                       Text(
-                          "保证金：${subject.orderBond}"
+                          "预留额度：${subject.orderBond}"
                       ),
 //                    导演
                       Text(
