@@ -1,7 +1,12 @@
+import 'package:flutter/material.dart';
 import 'dart:async' show Future;
 import '../utils/HttpUtils.dart';
 import '../model/book_cell.dart';
 import '../model/model_cell.dart';
+import '../routers/application.dart';
+import '../model/globle_model.dart';
+import '../model/userinfo.dart';
+
 class DataUtils {
 /*
 //import 'package:flutter/services.dart' show rootBundle;
@@ -9,6 +14,19 @@ class DataUtils {
     return await rootBundle.loadString('assets/pins.json');
   }
 */
+
+static Future freshUserinfo(BuildContext context) async{
+  Userinfo userinfo;
+  await HttpUtils.apipost(context, 'User/userInfo', {},
+          (response) async {
+        if (response["error_code"].toString() == '1') {
+          userinfo=Userinfo.fromJson(response["userinfo"]);
+            final model = globleModel().of(context);
+            await model.setuserinfo(userinfo);
+        } else
+          Application.run(context, "/login");
+      });
+}
   // 首页九宫格列表数据
   static Future<List<ModelCell>> getIndexModelListData(
       Map<String, dynamic> params) async {

@@ -18,20 +18,23 @@ class globleModel extends Model {
 
   Future setlogin(String token, Map<String, dynamic> userinfo) async {
     await setToken(token);
-    _userinfo = Userinfo.fromJson(userinfo);
-    print(_userinfo.phone+"=====");
-    // 通知所有的 listener
-    notifyListeners();
+    await setuserinfo(Userinfo.fromJson(userinfo));
   }
 
   Future setToken(String token) async {
     SharedPreferences prefs = await _prefs;
     await prefs.setString("token", token);
-    print("++++++++setlogin:$token ++++");
+//    print("++++++++setlogin:$token ++++");
     print("===SharedPreferences getString :${prefs.getString("token")}---");
     _token = token;
     _loginStatus = true;
 
+    notifyListeners();
+  }
+
+  Future setuserinfo(Userinfo userinfo) async {
+//    print(userinfo);
+    _userinfo = userinfo;
     notifyListeners();
   }
 

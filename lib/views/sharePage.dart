@@ -115,7 +115,7 @@ class sharePageState extends State<sharePage>
               itemBuilder: (BuildContext context, int index) {
 //                return Image(image: new CachedNetworkImageProvider(_picList[index].imgurl));
                 return  CachedNetworkImage(
-                  placeholder: (context, url) => new CircularProgressIndicator(),
+                  placeholder: (context, url) => Text("拼命加载中……"),//new CircularProgressIndicator(strokeWidth: 2,),
                   imageUrl: _picList[index].imgurl,
 //                  width:  MediaQuery.of(context).size.width,
                   fit: BoxFit.fitHeight,

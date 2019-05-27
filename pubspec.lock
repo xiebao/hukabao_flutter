@@ -197,6 +197,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.7.0"
+  flutter_native_image:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "249357866afda4d9d41623a8152947fa19877836"
+      url: "https://github.com/btastic/flutter_native_image"
+    source: git
+    version: "0.0.4"
   flutter_page_indicator:
     dependency: transitive
     description:
@@ -285,7 +294,21 @@ packages:
       name: image
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
+  image_crop:
+    dependency: "direct main"
+    description:
+      name: image_crop
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.1"
+  image_picker:
+    dependency: "direct main"
+    description:
+      name: image_picker
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.6.0+8"
   json_annotation:
     dependency: transitive
     description:

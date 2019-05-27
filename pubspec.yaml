@@ -43,6 +43,14 @@ dependencies:
 #  qrcode_reader: ^0.4.4
 #  image_picker: 0.4.12+1
 #  video_player: ^0.8.0
+#  image: any
+  image_crop: any
+  image_picker: any
+  flutter_native_image:
+    git: https://github.com/btastic/flutter_native_image
+#
+#  image_downloader: any
+#  multi_image_picker: any
 
   #  微信
   fluwx: ^0.6.1
