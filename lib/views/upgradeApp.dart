@@ -7,12 +7,11 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:package_info/package_info.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-//import 'package:open_file/open_file.dart';
+import 'package:ota_update/ota_update.dart';
 import '../globleConfig.dart';
 import '../utils/updateApp.dart';
 import '../utils/DialogUtils.dart';
-//import 'package:downloads_path_provider/downloads_path_provider.dart';
+
 
 class upgGradePage extends StatefulWidget {
   @override
@@ -20,18 +19,16 @@ class upgGradePage extends StatefulWidget {
 }
 
 class upgGradePageState extends State<upgGradePage> {
-  String _taskId, _finalApkPath, _fileName, _localPath;
-
-  double _loading = 0.0;
+  String _loading = '0';
   String _packageInfovs, _packageInfobn;
   String _newVersioncontent;
   var _ostypename;
 
+  String _latestAndroid =  "https://down.hukabao.com/andriod/app-release-flutter.apk";
+  String _latestIOS = "https://down.hukabao.com/ios/hkb.ipa";
   Future<bool> checkInfo() async {
     print("<net---> download :");
     bool retslt = false;
-    // 获取此时版本
-
     setState(() {
       _ostypename = UpdateApp.defaultTargetPlatform;
     });
@@ -74,19 +71,23 @@ class upgGradePageState extends State<upgGradePage> {
         }
         if (response.data["update"] != null) {
           String newVersion = response.data["update"]['verCode'].toString();
-          setState(() {
-            _newVersioncontent =
-                "${response.data["update"]['ver']}(${newVersion}):${response.data["update"]['title']}:${response.data["update"]['content']} ";
-          });
+          if (newVersion.compareTo(packageInfo.buildNumber) > 0) {
+            print(newVersion + "|compareTo|" + packageInfo.buildNumber);
 
-          if (await UpdateApp().checkPermission()) {
-            if (newVersion.compareTo(packageInfo.buildNumber) > 0) {
-              print(newVersion + "|compareTo|" + packageInfo.buildNumber);
-              retslt = true;
+            setState(() {
+              _newVersioncontent =
+              "${response.data["update"]['ver']}(${newVersion}):${response.data["update"]['title']}:${response.data["update"]['content']} ";
+            });
+
+            if (_ostypename == TargetPlatform.android) {
+              _latestAndroid =  response.data["update"]["url"];
+            } else if (_ostypename == Platform.isIOS) {
+              _latestIOS =response.data["update"]["url"];
             }
-          } else {
-            print('权限不容许');
+
+            retslt = true;
           }
+
         }
       });
     } catch (exception) {
@@ -101,53 +102,38 @@ class upgGradePageState extends State<upgGradePage> {
     print(ischecked == true ? "yes" : "no");
 
     if (ischecked == false) return false;
+    try {
 
-    _finalApkPath = await UpdateApp().apkLocalPath;
-//   final directory = await DownloadsPathProvider.downloadsDirectory;
-
-    await UpdateApp().checkPermission();
-    setState(() {
-      _localPath = _finalApkPath + '/Download';
-    });
-    final savedDir = Directory(_localPath);
-    bool hasExisted = await savedDir.exists();
-    if (!hasExisted) {
-      savedDir.create();
+      //"itms-services://?action=download-manifest&url=https:/down.hukabao.com/ios/hkb.plist";
+/*
+       *//*Flutter plugin implementing OTA update.
+       On Android it downloads the file (with progress reporting) and triggers app installation intent.
+       On iO*//*S it opens safari with specified ipa url. (not yet functioning)
+    */
+      if (Platform.isAndroid) {
+        OtaUpdate().execute(_latestAndroid).listen((OtaEvent event) {
+          print('EVENT: ${event.status} : ${event.value}');
+          if(event.status ==OtaStatus.DOWNLOADING) {
+            setState(() {
+              _loading =event.value ;
+            });
+          }
+        });
+      } else if (Platform.isIOS) {
+        OtaUpdate().execute(_latestIOS).listen((OtaEvent event) {
+          print('EVENT: ${event.status} : ${event.value}');
+          if(event.status ==OtaStatus.DOWNLOADING) {
+            setState(() {
+              _loading =event.value ;
+            });
+          }
+        });
+      }
+    } catch (e) {
+      print('OTA update. Details: $e');
+      DialogUtils().showMyDialog(context, e);
     }
 
-    var nowTime = DateTime.now();
-    String fileround = nowTime.year.toString() +
-        nowTime.day.toString() +
-        nowTime.hour.toString() +
-        nowTime.minute.toString() +
-        nowTime.microsecond.toString();
-    _fileName = 'hukabao${fileround}.apk'; //'app-release-flutter.apk';
-
-    String url;
-    if (_ostypename == TargetPlatform.android) {
-      url = "https://down.hukabao.com/andriod/hkb.apk";
-    } else if (_ostypename == Platform.isIOS) {
-      print('ios down!');
-      url =
-          "itms-services://?action=download-manifest&url=https:/down.hukabao.com/ios/hkb.plist'";
-      _fileName = "hukaba-oflu.ipa";
-    }
-
-    await FlutterDownloader.loadTasks();
-
-    final taskId = await FlutterDownloader.enqueue(
-      url: url,
-      savedDir: _localPath,
-      fileName: _fileName,
-      showNotification:
-          true, // show download progress in status bar (for Android)
-      openFileFromNotification:
-          true, // click on notification to open downloaded file (for Android)
-    );
-
-    setState(() {
-      _taskId = taskId;
-    });
   }
 
   void initdown() async {
@@ -157,46 +143,6 @@ class upgGradePageState extends State<upgGradePage> {
   @override
   void initState() {
     super.initState();
-//    FlutterDownloader.cancelAll();
-
-    FlutterDownloader.registerCallback((id, status, progress) async {
-      print(
-          'Download task ($id) is in status ($status) and process ($progress) status ${DownloadTaskStatus.complete} _localPath=$_localPath');
-      setState(() {
-        _loading = progress / 100;
-      });
-      if (_taskId == id && status == DownloadTaskStatus.complete) {
-        print('下载完成了$_localPath');
-        var result = await MethodChannel(
-                "com.hukabao.flutter.xiebaoxin/channel", StandardMethodCodec())
-            .invokeMethod("install", {"appfile": _localPath + "/" + _fileName});
-        print(result);
-
-//        if (result == "NO") {
-          if (await DialogUtils()
-              .showMyDialog(context, '已下载完成，请确认打开应用内升级安装权限，是否安装新版本?')) {
-            await MethodChannel("com.hukabao.flutter.xiebaoxin/channel",
-                    StandardMethodCodec())
-                .invokeMethod(
-                    "install", {"appfile": _localPath + "/" + _fileName});
-          } else
-            Navigator.of(context).pop(true);
-//        }
-        /*
-        OpenFile.open(_localPath+ "/" + _fileName);
-        FlutterDownloader.open(taskId: id);*/
-
-        /*
-        import 'package:install_plugin/install_plugin.dart';install_plugin  2.0.0
-         InstallPlugin.installApk(_apkFilePath, 'com.zaihui.installpluginexample')
-          .then((result) {
-        print('install apk $result');
-      }).catchError((error) {
-        print('install apk error: $error');
-      });
-      */
-      }
-    });
     initdown();
   }
 
@@ -218,15 +164,13 @@ class upgGradePageState extends State<upgGradePage> {
                   Text("新版本信息:$_newVersioncontent"),
                   Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(_loading > 0.9
-                          ? "请注意稍后提示打开应用内安装权限，"
-                          : "已下载：${(_loading * 100).toStringAsFixed(0)}%")),
-                  LinearProgressIndicator(
+                     child: Text(_loading == '0' ? "正在下载……，" : "已下载：$_loading%",style: TextStyle(color: Colors.red, fontSize: 14.0),)),
+     /*           LinearProgressIndicator(
                     backgroundColor: Colors.blue,
                     value: _loading,
                     semanticsLabel: '正在下载新版本……',
                     valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
-                  ),
+                  ),*/
                 ],
               ),
             ),
@@ -238,7 +182,5 @@ class upgGradePageState extends State<upgGradePage> {
   @override
   void dispose() {
     super.dispose();
-    FlutterDownloader.cancelAll();
-    FlutterDownloader.remove(taskId: _taskId);
   }
 }

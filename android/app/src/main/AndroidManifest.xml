@@ -55,33 +55,16 @@
                 tools:replace="android:resource" />
         </provider>
 
-        <!-- Flutterdownloader configuration -->
         <provider
-            android:name="vn.hunghd.flutterdownloader.DownloadedFileProvider"
-            android:authorities="${applicationId}.flutter_downloader.provider"
+            android:name="sk.fourq.otaupdate.OtaUpdateFileProvider"
+            android:authorities="sk.fourq.ota_update.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/filepaths" />
         </provider>
 
-        <provider
-            android:name="androidx.work.impl.WorkManagerInitializer"
-            android:authorities="${applicationId}.workmanager-init"
-            android:enabled="false"
-            android:exported="false" />
-
-        <provider
-            android:name="vn.hunghd.flutterdownloader.FlutterDownloaderInitializer"
-            android:authorities="${applicationId}.flutter-downloader-init"
-            android:exported="false">
-            <meta-data
-                android:name="vn.hunghd.flutterdownloader.MAX_CONCURRENT_TASKS"
-                android:value="5" />
-        </provider>
-
-        <!-- Flutterdownloader configuration end -->
 
     </application>
 </manifest>

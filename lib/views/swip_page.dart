@@ -25,7 +25,13 @@ class SwipPage extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           return InkWell(
             child:CachedNetworkImage(
-              placeholder: (context, url) =>CircularProgressIndicator(),// new Text('欢迎来到护卡宝'),
+              placeholder: (context, url) =>SizedBox(
+                width: 50.0,
+                height: 50.0,
+                child: CircularProgressIndicator(
+                  backgroundColor: Color(0xffff0000),
+                ),
+              ),// new Text('欢迎来到护卡宝'),
               imageUrl: picList[index].imgurl,
               width:  MediaQuery.of(context).size.width,
               height: 200,

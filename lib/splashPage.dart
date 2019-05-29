@@ -44,12 +44,6 @@ class SplashState extends State<SplashPage> {
           prefs.setString("update", 'no');
         } else {
           prefs.remove('update');
-//          await MethodChannel("com.hukabao.flutter.xiebaoxin/channel", StandardMethodCodec()).invokeMethod("installtest", {"appfile": '/storage/emulated/0/Download/hkb.apk'});
-        /*        Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => upgGradePage()),
-              (Route router) => false);*/
-
           await Navigator.push(
             context,
             MaterialPageRoute(
