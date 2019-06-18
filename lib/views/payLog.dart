@@ -88,7 +88,7 @@ class payLogPageState extends State<payLogPage> {
                     Text(
                         '结果：${subject.status}'
                     ),
-                    const SizedBox(height: 5.0),
+                    SizedBox(height: 5.0),
                   ],
                 ),
               )

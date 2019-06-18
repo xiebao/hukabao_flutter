@@ -395,7 +395,7 @@ class addCardState extends State<addCard> {
   }
 
   Widget _buildIdcardText() {
-    return ComFunUtil().buideStandInput(context, '身份证号',_idCardCtrl,iType: 'number',maxlen: 18,enable:_idCard.isNotEmpty?false:true, valfun: (value){
+    return ComFunUtil().buideStandInput(context, '身份证号',_idCardCtrl,maxlen: 18,enable:_idCard.isNotEmpty?false:true, valfun: (value){
       if (value.isEmpty ||
           value.trim().length < 16 ||
           value.trim().length > 18) {

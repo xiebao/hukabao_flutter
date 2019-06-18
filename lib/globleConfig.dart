@@ -15,3 +15,10 @@ class GlobalConfig {
   static final  String base='http://app.hukabao.com/index.php/Api/';
   static final String wxAppId='wx002f0547fa2ff202';
 }
+
+class Klength{
+  static const double topBarHeight = 45;
+  static const double bottomBarHeight = 54;
+  static const double designWidth = 360; //设计稿宽度
+  static const double searchTxtFieldHeight=34;
+}

@@ -60,8 +60,8 @@ class IndexPageState extends State<IndexPage>
     double top = math.max(padding.top, EdgeInsets.zero.top);
 
     return SafeArea(
-      top: false,
-      bottom: true,
+      top: true,
+      bottom: false,
       child: !_isRequesting
           ? Center(
               child:

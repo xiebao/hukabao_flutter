@@ -8,7 +8,7 @@ import '../utils/HttpUtils.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:hukabao/components/ImageCropPage.dart';
 import '../utils/dataUtils.dart';
-import 'login.dart';
+import '../model/userinfo.dart';
 
 class MyInfoPage extends StatefulWidget {
   @override
@@ -50,8 +50,9 @@ class MyInfoPageState extends State<MyInfoPage>
   ];
 
   var rightArrowIcon = Icon(Icons.chevron_right, color: GlobalConfig.mainColor);
-  String _userName, _userAvatar, _usermoney, _chileds;
-  String _userPhone, _userlevel, _userlevelname;
+
+  Userinfo _userinfo;
+  String  _userAvatar;
 
   GlobalKey<RefreshHeaderState> _headerKey =
       new GlobalKey<RefreshHeaderState>();
@@ -119,10 +120,10 @@ class MyInfoPageState extends State<MyInfoPage>
     String texti = '';
     switch (i) {
       case 5:
-        texti = _usermoney;
+        texti = _userinfo.money;
         break;
       case 6:
-        texti = _chileds;
+        texti = _userinfo.childs;
         break;
     }
 
@@ -134,7 +135,7 @@ class MyInfoPageState extends State<MyInfoPage>
             child: new Row(
               children: <Widget>[
                 Container(
-                  child: Icon(icons[i - 1]),
+                  child: Icon(icons[i - 1],color: Colors.black26,),
                   margin: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
                 ),
                 new Expanded(
@@ -202,14 +203,14 @@ class MyInfoPageState extends State<MyInfoPage>
           Container(
             margin: EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
             child: Text(
-              (_userName ?? _userPhone) + "[$_userlevelname]",
+              (_userinfo.name ?? _userinfo.phone) + "["+_userinfo.levelname+"]",
               style: new TextStyle(color: Colors.white, fontSize: 16.0),
             ),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(0.0, 5.0, 0.0, 0.0),
             child: Text(
-              "余额：$_usermoney 元",
+              "余额："+_userinfo.money+" 元",
               style: new TextStyle(color: Colors.white70, fontSize: 14.0),
             ),
           ),
@@ -267,13 +268,8 @@ class MyInfoPageState extends State<MyInfoPage>
     if (_token == '') {
       DialogUtils.close2Logout(context);
     } else {
-      _userName = model.userinfo.name;
+      _userinfo = model.userinfo;
       _userAvatar = model.userinfo.avtar;
-      _userPhone = model.userinfo.phone;
-      _userlevel = model.userinfo.level;
-      _userlevelname = model.userinfo.levelname;
-      _usermoney = model.userinfo.money;
-      _chileds = model.userinfo.childs;
     }
   }
 
