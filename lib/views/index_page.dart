@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../utils/dataUtils.dart';
+import '../utils/HttpUtils.dart';
 import '../components/index_model_list.dart';
 import '../model/index_model.dart';
 import '../model/model_cell.dart';
 import '../views/swip_page.dart';
 
 class IndexPage extends StatefulWidget {
-  IndexPage(this.picList);
-  final List<PicsCell> picList;
+/*  IndexPage(this.picList);
+  final List<PicsCell> picList;*/
 
   IndexPageState createState() => IndexPageState();
 }
@@ -49,6 +50,24 @@ class IndexPageState extends State<IndexPage>
     super.initState();
   }
 
+  List<PicsCell> _picList = [];
+
+  Future _initPicList() async {
+    await HttpUtils.apipost(context,'Index/cardIndex',{},(response) {
+      print("----------------adList--------------------");
+
+      PicsCell dd;
+      print(response['data']['adList']);
+
+        response['data']['adList'].forEach((ele) {
+          dd = PicsCell(
+              imgurl: ele['image_url'], title: ele['title'], url: ele['url']);
+          _picList.add(dd);
+        });
+    });
+    return _picList;
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -79,7 +98,30 @@ class IndexPageState extends State<IndexPage>
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, top, 0, 10.0),
-                  child:SwipPage(widget.picList),
+                  child:
+                  FutureBuilder(
+                    future: _initPicList(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {      //snapshot就是_calculation在时间轴上执行过程的状态快照
+                      switch (snapshot.connectionState) {
+                        case ConnectionState.none: return new Text('Press button to start');    //如果_calculation未执行则提示：请点击开始
+                        case ConnectionState.waiting: return new Text('Awaiting result...');  //如果_calculation正在执行则提示：加载中
+                        default:    //如果_calculation执行完毕
+                          if (snapshot.hasError)    //若_calculation执行出现异常
+                            return new Text('Error: ${snapshot.error}');
+                          else {
+                            if (snapshot.hasData) {
+                              return SwipPage(snapshot.data);
+                            } else {
+                              return Center(
+                                child: Text("加载中"),
+                              );
+                            }
+                          }   //若_calculation执行正常完成
+//                    return new Text('Result: ${snapshot.data}');
+                      }
+                    },
+                  ),
+
                 ), //, //
                 Expanded(
                   child: IndexModelList(_listData),

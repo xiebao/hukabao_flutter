@@ -7,7 +7,6 @@ import './views/index_page.dart';
 import './views/MyInfoPage.dart';
 import './model/index_model.dart';
 import './model/globle_model.dart';
-import './utils/HttpUtils.dart';
 
 class homePage extends StatefulWidget {
   @override
@@ -44,23 +43,6 @@ class homePageState extends State<homePage>
   Image getTabImage(path) {
     return new Image.asset(path, width: 20.0, height: 20.0);
   }
-  List<PicsCell> _picList = [];
-
-  void _initPicList() async {
-    await HttpUtils.apipost(context,'Index/cardIndex',{},(response) {
-      print("----------------adList--------------------");
-
-      PicsCell dd;
-      print(response['data']['adList']);
-      setState(() {
-        response['data']['adList'].forEach((ele) {
-          dd = PicsCell(
-              imgurl: ele['image_url'], title: ele['title'], url: ele['url']);
-          _picList.add(dd);
-        });
-      });
-    });
-  }
 
   void initData() {
     if (tabImages == null) {
@@ -82,7 +64,7 @@ class homePageState extends State<homePage>
     }
 
     _pages = [
-      IndexPage(_picList), cardLists(true), MyInfoPage(),
+      IndexPage(), cardLists(true), MyInfoPage(),
     ];
   }
     //获取菜单栏字体样式
@@ -205,7 +187,6 @@ class homePageState extends State<homePage>
 
   @override
   void initState() {
-    _initPicList();
     super.initState();
     _controller = new AnimationController( vsync: this, duration: const Duration(seconds: 3));
   }

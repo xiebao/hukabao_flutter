@@ -3,6 +3,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import '../routers/application.dart';
 import '../model/index_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../components/loading_gif.dart';
 
 
 class RectSwiperPaginationBuilder extends SwiperPlugin {
@@ -76,13 +77,7 @@ class SwipPage extends StatelessWidget {
           : Swiper(
         itemBuilder: (BuildContext context, index) {
           return  CachedNetworkImage(
-            placeholder: (context, url) => SizedBox(
-              width: 50.0,
-              height: 50.0,
-              child: CircularProgressIndicator(
-                backgroundColor: Color(0xffff0000),
-              ),
-            ),
+            placeholder: (context, url) => Loading(color: Colors.deepOrange,),
             imageUrl:  this.picList[index].imgurl,
             height: height,
             width: width,
