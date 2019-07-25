@@ -210,8 +210,8 @@ class TabBarDemoState extends State<cardLists>
               MaterialPageRoute(
                 builder: (context) => addCard(
                     cardType: (cdtp + 1).toString() ?? '1',
-                    userName: _userName,
-                    UserIdNo: _userIdNo),
+                    userName: _userName??"",
+                    UserIdNo: _userIdNo??""),
               ),
             ).then((result) {
               print(result);

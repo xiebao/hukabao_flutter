@@ -73,12 +73,12 @@ class ComFunUtil {
       ),
       locale: 'zh',
       dateFormat: 'yyyy-mm-dd',
-      onChanged: (year, month, date) {
+      onChanged: (year, month, date) {/*
 //        debugPrint('onChanged date: $year-$month-$date');
         if (!showTitleActions) {
           callback(
               '$year-${month.toString().padLeft(2, '0')}-${date.toString().padLeft(2, '0')}');
-        }
+        }*/
       },
       onConfirm: (year, month, date) {
         callback(
